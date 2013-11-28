@@ -10,9 +10,9 @@
 ;;  (1 7 21 35 35 21 7 1))
 ;;       2
 (define (pascal n p)
-  (if (zero? p)
+  (if (= p 1)
       1
-      (if (zero? n)
+      (if (= n 1)
 	  0
 	  (+ (pascal (- n 1) (- p 1))
 	     (pascal (- n 1) p)))))

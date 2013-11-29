@@ -1,3 +1,6 @@
+;; This version uses lists, but it has better orders of growth.
+
+
 (define first car)
 (define rest cdr)
 (define second cadr)

@@ -1,8 +1,15 @@
+(define (square x)
+  (* x x))
+
+(define (cube x)
+  (* x x x))
+
+
 (define (good-enough? guess x)
-  (< (abs (- (* guess guess guess) x)) 0.001))
+  (< (abs (- (cube guess) x)) 0.001))
 
 (define (newapprox x y)
-  (/ (+ (/ x (* y y)) (* 2 y))
+  (/ (+ (/ x (square y)) (* 2 y))
      3))
 
 (define (cube-iter guess x)

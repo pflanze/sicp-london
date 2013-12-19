@@ -9,3 +9,8 @@
   (acc null-value a))
 
 
+;; product of the square root of every other number between a and b
+
+(define (prodsqother a b)
+  (accumulate * 1 sqrt a (lambda (x) (+ x 2)) b))
+

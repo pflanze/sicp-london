@@ -32,6 +32,12 @@
 
 (define board-size 8);; XX
 
+(define (diagonal1 row col)
+  (- row col))
+
+(define (diagonal2 row col)
+  (- col row))
+
 (define (safe? k positions)
   ;; check that none of the columns is the same?
   (let ((kpositions (filter (lambda (position)
@@ -46,7 +52,10 @@
 	     (and (null? (filter (lambda (pos)
 				   (= row (car pos)))
 				 others))
-		  ;; diagonal
+		  (null? (filter (let ((newdiag (diagonal1 newpos)))
+				   (lambda (pos)
+				     (= newdiag (diagonal1 pos))))
+				 others))
 		  ç))))))
 
 ;; empty-board

@@ -32,11 +32,14 @@
 
 (define board-size 8);; XX
 
-(define (diagonal1 row col)
-  (- row col))
+(define row car)
+(define col cadr)
 
-(define (diagonal2 row col)
-  (- col row))
+(define (diagonal1 v)
+  (- (row v) (col v)))
+
+(define (diagonal2 v)
+  (- (col v) (row v)))
 
 (define (safe? k positions)
   ;; check that none of the columns is the same?
@@ -56,7 +59,10 @@
 				   (lambda (pos)
 				     (= newdiag (diagonal1 pos))))
 				 others))
-		  ç))))))
+		  (null? (filter (let ((newdiag (diagonal2 newpos)))
+				   (lambda (pos)
+				     (= newdiag (diagonal2 pos))))
+				 others))))))))
 
 ;; empty-board
 
@@ -66,3 +72,11 @@
 
 ;; rest-of-queen
 
+(TEST
+ > (safe? 0 '((1 2) (3 4) (5 0)))
+ #t
+ > (safe? 0 '((5 2) (3 4) (5 0)))
+ #f
+ > (safe? 0 '((3 4) (5 0) (6 1)))
+ #f
+ )

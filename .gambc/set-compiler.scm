@@ -60,6 +60,8 @@
       (cons key (cons val lis))
       lis))
 
+(define mod:compiled? (make-parameter #f))
+
 (define (c/load name #!key ld-options cc-options)
   ;; possibly compile and load:
   (let* ((compile-options (set-compiler:perhaps-add
@@ -80,7 +82,9 @@
 		    (error "not yet implemented"))
 		   ((c) ;; compile
 		    (println (list "compiling: " name))
-		    (apply compile-file sourcefile compile-options)
+		    (parameterize
+		     ((mod:compiled? #t))
+		     (apply compile-file sourcefile compile-options))
 		    ;; gives #f on failure; but, we want to go to the debugger
 		    ;; maybe?, or at least stop the process, so:
 		    (object-load-if-changed name i))

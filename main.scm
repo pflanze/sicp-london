@@ -88,3 +88,22 @@
 (define (use-t4.1)
   (produce t4))
 
+
+
+
+;; AMB
+
+
+
+(define (t5)
+  (let ((a (amb (list 1 2 3 4 5 6 7)))
+	(b (amb (list 1 2 3 4 5 6 7)))
+	(c (amb (list 1 2 3 4 5 6 7))))
+    ;; assert
+    (assrt (= (* c c) (+ (* a a) (* b b))))
+    (assrt (< b a))
+    (list a b c)))
+
+;; such that (amb ) will pick an element of the list that satisfies
+;; the asserts that come later
+

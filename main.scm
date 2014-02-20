@@ -93,13 +93,37 @@
 
 ;; AMB
 
+(define STACK '())
+;;(define return #f)
 
+(define (amb l)
+  (call/cc
+   (L (return)
+      (let lp ((l l))
+	(if (null? l)
+	    (error "out of values to try")
+	    ;;(lp l)
+	    (let ((x (car l))
+		  (l* (cdr l)))
+	      (call/cc (L (cc)
+			  (set! STACK (cons cc STACK))
+			  (return x)))
+	      (lp l*)))))))
+
+(define (assrt c)
+  (if (not c)
+      (if (null? STACK)
+	  (error "out of things to try")
+	  (let ((cont (car STACK)))
+	    (set! STACK (cdr STACK))
+	    (cont #f)))))
 
 (define (t5)
   (let ((a (amb (list 1 2 3 4 5 6 7)))
 	(b (amb (list 1 2 3 4 5 6 7)))
 	(c (amb (list 1 2 3 4 5 6 7))))
     ;; assert
+    (step)
     (assrt (= (* c c) (+ (* a a) (* b b))))
     (assrt (< b a))
     (list a b c)))

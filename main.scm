@@ -94,7 +94,6 @@
 ;; AMB
 
 (define STACK '())
-;;(define return #f)
 
 (define (next-from-stack)
   (if (null? STACK)

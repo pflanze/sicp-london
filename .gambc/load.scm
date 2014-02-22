@@ -25,9 +25,9 @@
       (c/load "lib/string-util")
       (c/load "lib/srfi-11")
       (c/load "lib/slib-sort")
+      (c/load "lib/cj-symbol") ;; for tests
       (c/load "lib/list-util-2")
       (c/load "lib/string-quote")
-      (c/load "lib/cj-symbol") ;; for tests
       (c/load "lib/cj-functional") ;; requires apply-values from srfi-11.scm
       (c/load "lib/cj-curry")
 

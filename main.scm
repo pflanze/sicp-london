@@ -67,7 +67,7 @@
   (map (lambda (testx)
 	 (define fd
 	   (eval (list 'lambda (list by)
-		       (deriv e by))))
+		       (der e by))))
 	 (let ((dn (numder f testx))
 	       (ds (fd testx)))
 	   (list dn ds)))

@@ -77,7 +77,7 @@
 ;;  > ())
 
 
-
+(define ex1 '(* x y (+ x 3)))
 
 (define (variable? x)
   (symbol? x))
@@ -97,14 +97,28 @@
 (define (addend s)
   (cadr s))
 
-(define (augend s)
-  (caddr s))
+(define (augend s) ;;; confusing name now
+  (warn "augend:" s)
+  (let ((rest (cddr s)))
+    (if (null? (cdr rest))
+	(car rest)
+	(cons '+ rest))))
 
 (define (product? x)
   (and (pair? x) (eq? (car x) '*)))
 
 (define (multiplier p)
   (cadr p))
+
+
+;; (* x y (+ x 3))
+;; (* x (* y (+ x 3)))
+
+(define ex2 '(+ x y (* x 3)))
+;; (+ (deriv x) (deriv (+ (deriv y) (deriv (* x 3)))))--wrong
+;; (+ (deriv x) (deriv y) (deriv (* x 3)))
+;;=(+ (deriv x) (+ (deriv y) (+ (deriv (* x 3)) 0)))
+;;=(+ (deriv x) (deriv (+ y (+ (* x 3)))))
 
 (define (multiplicand p)
   (caddr p))
@@ -125,16 +139,6 @@
 	((and (number? a1) (number? a2)) (+ a1 a2))
 	(else (list '+ a1 a2))))
 
-(define (deriv exp var)
-  (cond ((number? exp) 0)
-	((variable? exp) (if (same-variable? exp var) 1 0))
-	((sum? exp) (make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
-	((product? exp)
-	 (make-sum (make-product (multiplier exp)
-				 (deriv (multiplicand exp) var))
-		   (make-product (deriv (multiplier exp) var)
-				 (multiplicand exp))))))
-
 (define (expon? exp)
   (and (pair? exp) (eq? (car exp) '**)))
 
@@ -150,9 +154,13 @@
 	(else (list '** base pow))))
 
 (define (deriv exp var)
-  (cond ((number? exp) 0)
-	((variable? exp) (if (same-variable? exp var) 1 0))
-	((sum? exp) (make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
+  (cond ((number? exp)
+	 0)
+	((variable? exp)
+	 (if (same-variable? exp var) 1 0))
+	((sum? exp)
+	 (make-sum (deriv (addend exp) var)
+		   (deriv (augend exp) var)))
 	((product? exp)
 	 (make-sum (make-product (multiplier exp) (deriv (multiplicand exp) var))
 		   (make-product (deriv (multiplier exp) var) (multiplicand exp))))

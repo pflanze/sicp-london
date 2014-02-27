@@ -77,8 +77,84 @@
 
 
 
+(define (variable? x)
+  (symbol? x))
 
+(define (same-variable? v1 v2)
+  (and (variable? v1) (variable? v2) (eq? v1 v2)))
 
-(define (make-sum a1 a1)
-  (cond ((=number? ))))
-(define (deriv exp ))
+(define (make-sum a1 a2)
+  (list '+ a1 a2))
+
+(define (make-product m1 m2)
+  (list '* m1 m2))
+
+(define (sum? x)
+  (and (pair? x) (eq? (car x) '+)))
+
+(define (addend s)
+  (cadr s))
+
+(define (augend s)
+  (caddr s))
+
+(define (product? x)
+  (and (pair? x) (eq? (car x) '*)))
+
+(define (multiplier p)
+  (cadr p))
+
+(define (multiplicand p)
+  (caddr p))
+
+(define (=number? exp num)
+  (and (number? exp) (= exp num)))
+
+(define (make-product p1 p2)
+  (cond ((or (=number? p1 0) (=number? p2 0)) 0)
+	((=number? p1 1) p2)
+	((=number? p2 1) p1)
+	((and (number? p1) (number? p2)) (* p1 p2))
+	(else (list '* p1 p2))))
+
+(define (make-sum a1 a2)
+  (cond ((=number? a1 0) a2)
+	((=number? a2 0) a1)
+	((and (number? a1) (number? a2)) (+ a1 a2))
+	(else (list '+ a1 a2))))
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+	((variable? exp) (if (same-variable? exp var) 1 0))
+	((sum? exp) (make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
+	((product? exp)
+	 (make-sum (make-product (multiplier exp)
+				 (deriv (multiplicand exp) var))
+		   (make-product (deriv (multiplier exp) var)
+				 (multiplicand exp))))))
+
+(define (expon? exp)
+  (and (pair? exp) (eq? (car exp) '**)))
+
+(define (expon-base exp) (cadr exp))
+
+(define (expon-pow exp) (caddr exp))
+
+(define (make-expon base pow)
+  (cond ((not (number? pow)) (error "power must be a number!"))
+   ((=number? pow 1) base)
+   ((=number? pow 0) 1)
+   (else (list '** base pow))))
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+	((variable? exp) (if (same-variable? exp var) 1 0))
+	((sum? exp) (make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
+	((product? exp)
+	 (make-sum (make-product (multiplier exp) (deriv (multiplicand exp) var))
+		   (make-product (deriv (multiplier exp) var) (multiplicand exp))))
+	((expon? exp)
+	 (make-product (expon-pow exp)
+		       (make-product (make-expon (expon-base exp)
+						 (- (expon-pow exp) 1))
+				     (deriv (expon-base exp) var))))))

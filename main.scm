@@ -7,9 +7,7 @@
 ;; ** for expt
 
 (define ex '(** (* x x) 2))
-(define examples
-  '(x
-    (** (* x x) 2)))
+
 
 
 (define (der e by)
@@ -51,7 +49,7 @@
 
 
 ;; numeric differentiation
-(define dx 0.0001)
+(define dx 0.0000001)
 (define (numder f x)
   (/ (- (f (+ x dx)) (f x))
      dx))
@@ -67,10 +65,10 @@
   (map (lambda (testx)
 	 (define fd
 	   (eval (list 'lambda (list by)
-		       (der e by))))
+		       (deriv e by))))
 	 (let ((dn (numder f testx))
 	       (ds (fd testx)))
-	   (list dn ds)))
+	   (list testx '|:| dn ds)))
        testnumbers))
 
 ;; (TEST
@@ -98,7 +96,7 @@
   (cadr s))
 
 (define (augend s) ;;; confusing name now
-  (warn "augend:" s)
+  ;;(warn "augend:" s)
   (let ((rest (cddr s)))
     (if (null? (cdr rest))
 	(car rest)
@@ -107,8 +105,15 @@
 (define (product? x)
   (and (pair? x) (eq? (car x) '*)))
 
-(define (multiplier p)
+(define (multiplier p) ;; p1
   (cadr p))
+
+(define (multiplicand p) ;; p2
+  ;;(warn "multiplicand:" p)
+  (let ((args (cddr p)))
+    (if (null? (cdr args))
+	(car args)
+	(cons '* args))))
 
 
 ;; (* x y (+ x 3))
@@ -119,9 +124,6 @@
 ;; (+ (deriv x) (deriv y) (deriv (* x 3)))
 ;;=(+ (deriv x) (+ (deriv y) (+ (deriv (* x 3)) 0)))
 ;;=(+ (deriv x) (deriv (+ y (+ (* x 3)))))
-
-(define (multiplicand p)
-  (caddr p))
 
 (define (=number? exp num)
   (and (number? exp) (= exp num)))
@@ -162,10 +164,21 @@
 	 (make-sum (deriv (addend exp) var)
 		   (deriv (augend exp) var)))
 	((product? exp)
-	 (make-sum (make-product (multiplier exp) (deriv (multiplicand exp) var))
-		   (make-product (deriv (multiplier exp) var) (multiplicand exp))))
+	 (make-sum (make-product (multiplier exp)
+				 (deriv (multiplicand exp) var))
+		   (make-product (deriv (multiplier exp) var)
+				 (multiplicand exp))))
 	((expon? exp)
 	 (make-product (expon-pow exp)
 		       (make-product (make-expon (expon-base exp)
 						 (- (expon-pow exp) 1))
 				     (deriv (expon-base exp) var))))))
+
+
+
+(define examples
+  `(x
+    (** (* x x) 2)
+    ,ex1
+    ,ex2))
+

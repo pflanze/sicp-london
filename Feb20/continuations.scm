@@ -113,13 +113,16 @@
 ;; ------------------------------------------------------------------
 ;; AMB
 
-(define STACK '())
+;; 'such that (amb ) will pick an element of the list that satisfies
+;; the asserts that come later'
+
+(define *stack* '())
 
 (define (next-from-stack)
-  (if (null? STACK)
+  (if (null? *stack*)
       (error "out of things to try")
-      (let ((cont (car STACK)))
-	(set! STACK (cdr STACK))
+      (let ((cont (car *stack*)))
+	(set! *stack* (cdr *stack*))
 	(cont cont))))
 
 (define (amb l)
@@ -131,7 +134,7 @@
 	    (let ((x (car l))
 		  (l* (cdr l)))
 	      (call/cc (lambda (cc)
-			  (set! STACK (cons cc STACK))
+			  (set! *stack* (cons cc *stack*))
 			  (return x)))
 	      (lp l*))))
       (lp l))))
@@ -145,13 +148,10 @@
   (let ((a (amb (list 1 2 3 4 5 6 7)))
 	(b (amb (list 1 2 3 4 5 6 7)))
 	(c (amb (list 1 2 3 4 5 6 7))))
-    (warn "testing: "
+    (warn "testing:"
 	  (list a b c)
-	  STACK)
+	  *stack*)
     (assrt (= (* c c) (+ (* a a) (* b b))))
     (assrt (< b a))
     (list a b c)))
-
-;; such that (amb ) will pick an element of the list that satisfies
-;; the asserts that come later
 

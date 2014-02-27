@@ -107,27 +107,6 @@
 ;; 	  (goto l)))))
 
 
-(define (t4 yield)
-  (define c 0)
-  (let ((l (label)))
-    (yield c)
-    (set! c (+ c 1))
-    (if (< c 10)
-	(goto l))))
-
-(define (use-t4.1)
-  (t4 println))
-
-;; (define (produce fn)
-;;   (call/cc (lambda (c)
-;; 	      )))
-
-(define (use-t4.1)
-  (produce t4))
-
-
-
-
 ;; ------------------------------------------------------------------
 ;; AMB
 

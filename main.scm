@@ -143,10 +143,11 @@
 (define (expon-pow exp) (caddr exp))
 
 (define (make-expon base pow)
-  (cond ((not (number? pow)) (error "power must be a number!"))
-   ((=number? pow 1) base)
-   ((=number? pow 0) 1)
-   (else (list '** base pow))))
+  (cond ((not (number? pow))
+	 (error "power must be a number!"))
+	((=number? pow 1) base)
+	((=number? pow 0) 1)
+	(else (list '** base pow))))
 
 (define (deriv exp var)
   (cond ((number? exp) 0)

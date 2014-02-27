@@ -35,3 +35,27 @@
  > (der ex)
  (* 2 (** (* x x) 1)))
 
+
+;; numeric differentiation
+(define dx 0.0001)
+(define (numder f x)
+  (/ (- (f (+ x dx)) (f x))
+     dx))
+
+(define testnumbers
+  (list -100 -10 -4 -.2 -.1 0 .1 .4 1.3 5 6 9 10 89))
+
+
+(define ** expt)
+
+(define (check e)
+  (define f (eval (list 'lambda '(x) e)))
+  (map (lambda (x)
+	 (define fd (eval (list 'lambda '(x) (der e))))
+	 (let ((dn (numder f x))
+	       (ds (fd x)))
+	   (list dn ds)))
+       testnumbers))
+
+;; (TEST
+;;  > ())

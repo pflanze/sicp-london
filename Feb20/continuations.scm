@@ -22,20 +22,68 @@
 	     (set! sc cc)
 	     x)))
 
+;; ------------------------------------------------------------------
 
 (define (current-continuation)
   (call/cc (L (cc) cc)))
 
 (define (tt)
   (let ((cc (current-continuation)))
-    ;; (cc cc)  endless loop; then: (0 not a procedure)
+    ;; return 42:
+    ;;42
+    ;; endless loop:
+    ;;(cc cc)
+    ;; "0 not a procedure":
     (cc 0)))
 
+;; <not-part-of-meetup>
+
+;; partially CPS transformed variant:
+
+(define (partialcps-tt)
+  ((lambda (cc)
+     ;; return 42:
+     ;;42
+     ;; endless loop:
+     ;;(cc cc)
+     ;; "0 not a procedure":
+     (cc 0))
+   (current-continuation)))
 
 
-;; label goto
+;; fully CPS transformed variant (works even if the underlying Scheme
+;; system doesn't have call/cc). A continuation is a function of one
+;; argument (no support for multiple values here). Using "cps:" prefix
+;; just to distinguish the names.
+
+(define (cps:call/cc continuation fn)
+  (fn continuation continuation))
+
+(define (cps:current-continuation continuation)
+  (cps:call/cc continuation
+	       (L (continuation cc)
+		  (continuation cc))))
+
+;; Call with: (cps:tt main) [or (cps:tt identity) ]
+(define (cps:tt continuation)
+  (cps:current-continuation
+   (lambda (cc)
+     ;; return 42:
+     ;;(continuation 42)
+     ;; endless loop: 
+     ;;(cc cc)
+     ;; "0 not a procedure":
+     (cc 0)
+     )))
+
+;; </not-part-of-meetup>
+
+;; ------------------------------------------------------------------
+;; label, goto
 
 (define label current-continuation)
+;; or (define (label) (current-continuation))
+;;  which does the same (but transparently wraps another parameterless function) 
 
 (define (goto l)
   (l l))
@@ -80,6 +128,7 @@
 
 
 
+;; ------------------------------------------------------------------
 ;; AMB
 
 (define STACK '())

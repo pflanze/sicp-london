@@ -9,7 +9,7 @@
 (define ex '(** (* x x) 2))
 
 
-(define (der e)
+(define (der e by)
   (let ((terms
 	 (list
 	  (cons '**
@@ -19,17 +19,23 @@
 			      ;; (list '- x 1)
 			      (dec x))))))))
     
-    (if (pair? e)
-	(let ((a (car e)))
-	  (if (symbol? a)
-	      (cond ((assq a terms)
-		     => (lambda (k.expander)
-			  (apply (cdr k.expander) (cdr e))))
-		    (else
-		     (error "no function definitions?")))
-	      (error "no first class functions?")))
-	;; assume constant?
-	e)))
+    (cond ((pair? e)
+	   (let ((a (car e)))
+	     (if (symbol? a)
+		 (cond ((assq a terms)
+			=> (lambda (k.expander)
+			     (apply (cdr k.expander) (cdr e))))
+		       (else
+			(error "no function definitions?")))
+		 (error "no first class functions?"))))
+	  ((symbol? e)
+	   (if (eq? e by)
+	       1
+	       (error "unfinished:  e or 0?")))
+	  ((number? e)
+	   0)
+	  (else
+	   (error "unhandled:" e)))))
 
 (TEST
  > (der ex)
@@ -48,12 +54,12 @@
 
 (define ** expt)
 
-(define (check e)
-  (define f (eval (list 'lambda '(x) e)))
-  (map (lambda (x)
-	 (define fd (eval (list 'lambda '(x) (der e))))
-	 (let ((dn (numder f x))
-	       (ds (fd x)))
+(define (check e by)
+  (define f (eval (list 'lambda (list by) e)))
+  (map (lambda (testx)
+	 (define fd (eval (list 'lambda (list by) (der e by))))
+	 (let ((dn (numder f testx))
+	       (ds (fd testx)))
 	   (list dn ds)))
        testnumbers))
 

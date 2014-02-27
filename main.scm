@@ -96,11 +96,12 @@
   (cadr s))
 
 (define (augend s) ;;; confusing name now
-  ;;(warn "augend:" s)
-  (let ((rest (cddr s)))
-    (if (null? (cdr rest))
-	(car rest)
-	(cons '+ rest))))
+  (warn "augend:" s)
+  (pp-through
+   (let ((rest (cddr s)))
+     (if (null? (cdr rest))
+	 (car rest)
+	 (cons '+ rest)))))
 
 (define (product? x)
   (and (pair? x) (eq? (car x) '*)))
@@ -109,7 +110,7 @@
   (cadr p))
 
 (define (multiplicand p) ;; p2
-  ;;(warn "multiplicand:" p)
+  (warn "multiplicand:" p)
   (let ((args (cddr p)))
     (if (null? (cdr args))
 	(car args)

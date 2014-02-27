@@ -25,7 +25,7 @@
 ;; ------------------------------------------------------------------
 
 (define (current-continuation)
-  (call/cc (L (cc) cc)))
+  (call/cc (lambda (cc) cc)))
 
 (define (tt)
   (let ((cc (current-continuation)))
@@ -61,8 +61,8 @@
 
 (define (cps:current-continuation continuation)
   (cps:call/cc continuation
-	       (L (continuation cc)
-		  (continuation cc))))
+	       (lambda (continuation cc)
+		 (continuation cc))))
 
 ;; Call with: (cps:tt main) [or (cps:tt identity) ]
 (define (cps:tt continuation)
@@ -119,7 +119,7 @@
   (t4 println))
 
 ;; (define (produce fn)
-;;   (call/cc (L (c)
+;;   (call/cc (lambda (c)
 ;; 	      )))
 
 (define (use-t4.1)
@@ -142,13 +142,13 @@
 
 (define (amb l)
   (call/cc
-   (L (return)
+   (lambda (return)
       (define (lp l)
 	(if (null? l)
 	    (next-from-stack)
 	    (let ((x (car l))
 		  (l* (cdr l)))
-	      (call/cc (L (cc)
+	      (call/cc (lambda (cc)
 			  (set! STACK (cons cc STACK))
 			  (return x)))
 	      (lp l*))))

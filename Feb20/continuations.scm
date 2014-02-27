@@ -97,14 +97,17 @@
 	(goto l))))
 
 
-;; (define (t3)
-;;   (define c 0)
-;;   (lambda (XXX)
-;;     (let ((l XXX))
-;;       (println c)
-;;       (set! c (+ c 1))
-;;       (if (< c 10)
-;; 	  (goto l)))))
+;; ..which is the same as (let turned into lambda, and inlined goto
+;; call):
+
+(define (t3b)
+  (define c 0)
+  ((lambda (l)
+     (println c)
+     (set! c (+ c 1))
+     (if (< c 10)
+	 (l l)))
+   (current-continuation)))
 
 
 ;; ------------------------------------------------------------------

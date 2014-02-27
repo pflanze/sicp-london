@@ -53,27 +53,31 @@
 
 ;; fully CPS transformed variant (works even if the underlying Scheme
 ;; system doesn't have call/cc). A continuation is a function of one
-;; argument (no support for multiple values here). Using "cps:" prefix
-;; just to distinguish the names.
+;; two arguments, a continuation and a value (not supporting multiple
+;; value 'returns' here). Using "cps:" prefix just to distinguish the
+;; names.
+
+(define (cps:main val)
+  val)
 
 (define (cps:call/cc continuation fn)
   (fn continuation continuation))
 
 (define (cps:current-continuation continuation)
   (cps:call/cc continuation
-	       (lambda (continuation cc)
+	       (lambda (cc)
 		 (continuation cc))))
 
-;; Call with: (cps:tt main) [or (cps:tt identity) ]
+;; Call with: (cps:tt cps:main)
 (define (cps:tt continuation)
   (cps:current-continuation
    (lambda (cc)
      ;; return 42:
-     ;;(continuation 42)
+     (continuation 42)
      ;; endless loop: 
-     ;;(cc cc)
+     ;;(cc continuation cc)
      ;; "0 not a procedure":
-     (cc 0)
+     ;;(cc continuation 0)
      )))
 
 ;; </not-part-of-meetup>
@@ -144,14 +148,18 @@
       (next-from-stack)))
 
 (define (t5)
-  (step)
+  ;;(step)
   (let ((a (amb (list 1 2 3 4 5 6 7)))
 	(b (amb (list 1 2 3 4 5 6 7)))
 	(c (amb (list 1 2 3 4 5 6 7))))
-    (warn "testing:"
-	  (list a b c)
-	  *stack*)
+    ;; (warn "testing:"
+    ;; 	  (list a b c)
+    ;; 	  *stack*)
     (assrt (= (* c c) (+ (* a a) (* b b))))
     (assrt (< b a))
-    (list a b c)))
+    (list a b c)
+    ;; to show all matching results:
+    ;;(warn "FOUND:" (list a b c))
+    ;;(next-from-stack)
+    ))
 

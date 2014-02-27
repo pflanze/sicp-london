@@ -7,17 +7,25 @@
 ;; ** for expt
 
 (define ex '(** (* x x) 2))
+(define examples
+  '(x
+    (** (* x x) 2)))
 
 
 (define (der e by)
   (let ((terms
 	 (list
+	  (cons '*
+		(lambda (x1 x2)
+		  (list '+
+			(list '* x2 (der x1 by))
+			(list '* x1 (der x2 by)))))
 	  (cons '**
-		(lambda (u x)
-		  (list '* x
-			(list '** u
-			      ;; (list '- x 1)
-			      (dec x))))))))
+		(lambda (u n)
+		  (list '*
+			n
+			(list '** u (dec n));;XX
+			(der u by)))))))
     
     (cond ((pair? e)
 	   (let ((a (car e)))
@@ -39,7 +47,7 @@
 
 (TEST
  > (der ex)
- (* 2 (** (* x x) 1)))
+ (* 4 (** x 3)))
 
 
 ;; numeric differentiation

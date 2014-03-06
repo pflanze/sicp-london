@@ -125,10 +125,11 @@
 		   (lambda (t1 t2) ;; t1 has smaller entry than t2
 		     (tree-add (entry t1)
 			       (tree-add (entry t2)
-					 (union-tree (right-branch t1)
-						     (left-branch t2))
-					 (union-tree (left-branch t1)
-						     (right-branch t2)))))))
+					 (union-tree
+					  (union-tree (right-branch t1)
+						      (left-branch t2))
+					  (union-tree (left-branch t1)
+						      (right-branch t2))))))))
 	   (cond ((= (entry a) (entry b))
 		  (make-tree (entry a)
 			     (union-tree (left-branch a)

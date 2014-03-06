@@ -24,61 +24,103 @@
 
 ;; ------------------------------------------------------------------
 
+(define (identity x) x)
+
 (define (current-continuation)
-  (call/cc (lambda (cc) cc)))
+  (call/cc identity))
 
 (define (tt)
   (let ((cc (current-continuation)))
-    ;; return 42:
+    ;; returning 42:
     ;;42
-    ;; endless loop:
+    ;; going into an endless loop:
     ;;(cc cc)
-    ;; "0 not a procedure":
+    ;; hitting "0 is not a procedure":
     (cc 0)))
 
 ;; <not-part-of-meetup>
 
 ;; partially CPS transformed variant:
 
-(define (partialcps-tt)
+(define (partialcps:tt)
   ((lambda (cc)
-     ;; return 42:
+     ;; returning 42:
      ;;42
-     ;; endless loop:
+     ;; going into an endless loop:
      ;;(cc cc)
-     ;; "0 not a procedure":
+     ;; hitting "0 is not a procedure":
      (cc 0))
    (current-continuation)))
 
 
-;; fully CPS transformed variant (works even if the underlying Scheme
-;; system doesn't have call/cc). A continuation is a function of one
-;; two arguments, a continuation and a value (not supporting multiple
-;; value 'returns' here). Using "cps:" prefix just to distinguish the
-;; names.
+;; Fully CPS transformed variant (which means it works without relying
+;; on call/cc of the Scheme interpreter (in fact it works without
+;; using implicit continuations ("returns") at all, except for
+;; cps:main)). A continuation is a function of one or more arguments,
+;; values (usually one, multiple of them are supported in Scheme by
+;; way of the |values| and |call-with-values| procedures, and in our
+;; CPS transformed code by way of the cps:-prefixed equivalents
+;; you find defined further down).
+;; Using a "cps:" prefix just to distinguish the names.
 
-(define (cps:main val)
-  val)
+(define cps:main identity) ;; the initial continuation, which 'lifts'
+			   ;; (returns) the end result to the normal
+			   ;; Scheme continuation (which is the
+			   ;; 'print' in "repl").
 
-(define (cps:call/cc continuation fn)
-  (fn continuation continuation))
+(define (cps:identity cont x)
+  (cont x))
 
-(define (cps:current-continuation continuation)
-  (cps:call/cc continuation
-	       (lambda (cc)
-		 (continuation cc))))
+(define (cps:call/cc cont fn)
+  (fn cont
+      ;; we need to wrap cont so that we follow the CPS function
+      ;; calling convention:
+      (lambda (ignored-cont . vals)
+	(apply cont vals))))
+
+(define (cps:current-continuation cont)
+  (cps:call/cc cont cps:identity))
 
 ;; Call with: (cps:tt cps:main)
-(define (cps:tt continuation)
+(define (cps:tt cont)
   (cps:current-continuation
+   ;; (this lambda is representing a continuation, not a function: )
    (lambda (cc)
-     ;; return 42:
-     (continuation 42)
-     ;; endless loop: 
-     ;;(cc continuation cc)
-     ;; "0 not a procedure":
-     ;;(cc continuation 0)
+     ;; (^ but cc is a function that wraps a continuation)
+
+     ;; returning 42:
+     ;;(cont 42)
+     ;; going into an endless loop:
+     ;;(cc cont cc)
+     ;; hitting "0 is not a procedure":
+     (cc cont 0)
      )))
+
+
+;; Multiple value support:
+
+;; Normal Scheme:
+;; > (call-with-values (lambda ()
+;;                        (values 1 2 3))
+;;                     (lambda (a b c)
+;;                        b))
+;; 2
+
+(define (cps:call-with-values cont producer consumer)
+  ;; If Scheme had automatic currying, it would be:
+  ;;    (producer (consumer cont))
+  (producer (lambda vals
+	      (apply consumer cont vals))))
+
+(define (cps:values cont . vals)
+  (apply cont vals))
+
+;; > (cps:call-with-values cps:main
+;; 		      (lambda (cont)
+;; 			(cps:values cont 1 2 3))
+;; 		      (lambda (cont a b c)
+;; 			(cont b)))
+;; 2
 
 ;; </not-part-of-meetup>
 

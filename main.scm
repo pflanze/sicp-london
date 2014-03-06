@@ -76,7 +76,7 @@
                       remaining-elts))))))))
 
 (TEST
- > (define t2 (list->tree '(1 9 38 4 5)))
+ > (define t2 (list->tree '(1 4 5 9 38)))
  )
 
 
@@ -121,7 +121,8 @@
  > (tree->list t1)
  (3 4 5 7 8 10 11)
  > (tree->list t2)
- (1 9 38 4 5)
+ (1 4 5 9 38)
  > (tree->list (union-tree t1 t2))
- (1 3 4 5 7 8 9 10 11 38 4 5)
+ (1 3 4 5 7 8 9 10 11 38)
  )
+

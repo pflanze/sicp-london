@@ -114,8 +114,23 @@
 
 ;; O(n) ? well
 
-(define (union-tree a b)
+(define (union-tree.easy a b)
   (list->tree (union-sorted (tree->list a) (tree->list b))))
+
+(define (union-tree a b)
+  (cond ((null? a) b)
+	((null? b) a)
+	(else
+	 (cond ((= (entry a) (entry b))
+		(make-tree (entry a)
+			   (union-tree (left-branch a)
+				       (left-branch b))
+			   (union-tree (right-branch a)
+				       (right-branch b))))
+	       ((< (entry a) (entry b))
+		;; now ?
+		)))))
+
 
 (TEST
  > (tree->list t1)

@@ -129,7 +129,13 @@
 				       (right-branch b))))
 	       ((< (entry a) (entry b))
 		;; now ?
-		)))))
+		;; We need to make at least one of a or b smaller.
+		(make-tree (entry a)
+			   (union-tree (left-branch a)
+				       (left-branch b))
+			   (make-tree (entry b) ;;WRONG
+				      (union-tree (right-branch a)
+						  (right-branch b)))))))))
 
 
 (TEST

@@ -122,20 +122,21 @@
 	((null? b) a)
 	(else
 	 (let ((make
-		   (lambda (a b)
-		     (make-tree (entry a)
-				(make-tree (entry b)
-					   (union-tree (left-branch a)
-						       (left-branch b))
-					   (union-tree (right-branch a)
-						       (right-branch b)))
-				empty-tree))))
+		   (lambda (t1 t2) ;; t1 has smaller entry than t2
+		     (make-tree (entry t1)
+				(left-branch t1)
+				(make-tree (entry t2)
+					   (union-tree (right-branch t1)
+						       (left-branch t2))
+					   (right-branch t2))))))
 	   (cond ((= (entry a) (entry b))
 		  (make-tree (entry a)
 			     (union-tree (left-branch a)
 					 (left-branch b))
 			     (union-tree (right-branch a)
 					 (right-branch b))))
+		 ;; Strategy?
+		 ;; - pick 
 		 ((< (entry a) (entry b))
 		  ;; now ?
 		  ;; We need to make at least one of a or b smaller.

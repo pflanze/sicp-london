@@ -121,21 +121,27 @@
   (cond ((null? a) b)
 	((null? b) a)
 	(else
-	 (cond ((= (entry a) (entry b))
-		(make-tree (entry a)
-			   (union-tree (left-branch a)
-				       (left-branch b))
-			   (union-tree (right-branch a)
-				       (right-branch b))))
-	       ((< (entry a) (entry b))
-		;; now ?
-		;; We need to make at least one of a or b smaller.
-		(make-tree (entry a)
-			   (union-tree (left-branch a)
-				       (left-branch b))
-			   (make-tree (entry b) ;;WRONG
-				      (union-tree (right-branch a)
-						  (right-branch b)))))))))
+	 (let ((make
+		   (lambda (a b)
+		     (make-tree (entry a)
+				(make-tree (entry b)
+					   (union-tree (left-branch a)
+						       (left-branch b))
+					   (union-tree (right-branch a)
+						       (right-branch b)))
+				empty-tree))))
+	   (cond ((= (entry a) (entry b))
+		  (make-tree (entry a)
+			     (union-tree (left-branch a)
+					 (left-branch b))
+			     (union-tree (right-branch a)
+					 (right-branch b))))
+		 ((< (entry a) (entry b))
+		  ;; now ?
+		  ;; We need to make at least one of a or b smaller.
+		  (make a b))
+		 (else
+		  (make b a)))))))
 
 
 (TEST

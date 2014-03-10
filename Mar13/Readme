@@ -1,1 +1,7 @@
-Coding Dojo Sec 3.2
+Coding Dojo Sec 2.4
+
+This week we're starting our first look on sec 2.4 of the book.
+Speficially, we'll be learning how to handle multiple representations
+for data.  We'll be building a computer algebra system that's able to
+treat different implementations of rational numbers, complex numbers,
+et cetera, all on the same footing.

@@ -175,3 +175,40 @@
  (1 3 4 5 7 8 9 10 11 38)
  )
 
+
+;; ---- more tests: ---------------------------------------------
+
+(define (randomtree add start n)
+  (let ((is (map (lambda (_) (random-integer n)) (iota n))))
+    (values is
+	    (fold add start is))))
+
+;; an |and| that errors for non-true values
+(define-macro* (xand . es)
+  (let rec ((es es))
+    (if (null? es)
+	`#t
+	`(if ,(car es)
+	     ,(rec (cdr es))
+	     ;; XX only carry over location!  location-error, pls
+	     (source-error (source-dequote ',(source-quote (car es)))
+			   "xand: got false")))))
+
+(define (rtest n)
+  (letv ((is t) (randomtree adjoin-set empty-set n))
+	(let ((s0 (list-uniq = (sort is <))))
+	  (xand (equal? s0 (tree->list t))
+		(let ((all (iota n)))
+		  (letv ((is2 nonis) (partition (C element-of-set? _ t) all))
+			(xand (equal? is2 s0)
+			      (equal? (sort (append s0 nonis) <) all))))))))
+
+(TEST
+ > (rtest 100)
+ #t
+ > (rtest 1000)
+ #t
+ > (rtest 10000)
+ #t
+ )
+

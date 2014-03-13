@@ -106,3 +106,7 @@
 
 '(define (successive-merge s)
   )
+
+(define (successive-merge s)
+  hm?)
+

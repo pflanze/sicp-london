@@ -92,6 +92,10 @@
                       remaining-elts))))))))
 
 (TEST
+ > (list->tree '(1 2 3 4 5 6 7))
+ (4 (2 (1 () ()) (3 () ())) (6 (5 () ()) (7 () ())))
+ ;; hm
+ 
  > (define t2 (list->tree '(1 4 5 9 38)))
  )
 
@@ -139,13 +143,13 @@
 	(else
 	 (let ((make
 		   (lambda (t1 t2) ;; t1 has smaller entry than t2
-		     (tree-add (entry t1)
-			       (tree-add (entry t2)
-					 (union-tree
-					  (union-tree (right-branch t1)
-						      (left-branch t2))
-					  (union-tree (left-branch t1)
-						      (right-branch t2))))))))
+		     (adjoin-set (entry t1)
+				 (adjoin-set (entry t2)
+					     (union-tree
+					      (union-tree (right-branch t1)
+							  (left-branch t2))
+					      (union-tree (left-branch t1)
+							  (right-branch t2))))))))
 	   (cond ((= (entry a) (entry b))
 		  (make-tree (entry a)
 			     (union-tree (left-branch a)

@@ -1,5 +1,11 @@
 
-;; book
+
+(define empty-set '())
+(define empty-set? null?)
+
+;; http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-16.html#%_sec_2.3.3
+;; Sets as binary trees
+
 (define (entry tree) (car tree))
 (define (left-branch tree) (cadr tree))
 (define (right-branch tree) (caddr tree))
@@ -7,7 +13,7 @@
   (list entry left right))
 
 (define (element-of-set? x set)
-  (cond ((null? set) #f)
+  (cond ((empty-set? set) #f)
         ((= x (entry set)) #t)
         ((< x (entry set))
          (element-of-set? x (left-branch set)))
@@ -19,18 +25,16 @@
 
 ;; bonus: O(n)
 
-(define empty-tree '())
-
 (define t1
   (make-tree 5
 	     (make-tree 4
-			(make-tree 3 empty-tree empty-tree)
-			empty-tree)
+			(make-tree 3 empty-set empty-set)
+			empty-set)
 	     (make-tree 7
-			empty-tree
+			empty-set
 			(make-tree 10
-				   (make-tree 8 empty-tree empty-tree)
-				   (make-tree 11 empty-tree empty-tree)))))
+				   (make-tree 8 empty-set empty-set)
+				   (make-tree 11 empty-set empty-set)))))
 
 
 (TEST
@@ -81,9 +85,9 @@
 
 
 (define (union-sorted a b)
-  (cond ((null? a)
+  (cond ((empty-set? a)
 	 b)
-	((null? b)
+	((empty-set? b)
 	 a)
 	(else
 	 (cond ((= (car a) (car b))
@@ -118,8 +122,8 @@
   (list->tree (union-sorted (tree->list a) (tree->list b))))
 
 (define (union-tree a b)
-  (cond ((null? a) b)
-	((null? b) a)
+  (cond ((empty-set? a) b)
+	((empty-set? b) a)
 	(else
 	 (let ((make
 		   (lambda (t1 t2) ;; t1 has smaller entry than t2

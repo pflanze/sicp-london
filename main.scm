@@ -185,13 +185,19 @@
 		 (make-product (deriv (multiplier exp) var)
 			       (multiplicand exp)))))
 
+
+(define-macro* (define-method op+type+args . body)
+  `(put ',())
+  ;; (define-method ((deriv **)  exp var)
+  ;;   )
+
+  )
 (put 'deriv '**
      (lambda (exp var)
        (make-product (expon-pow exp)
 		     (make-product (make-expon (expon-base exp)
 					       (- (expon-pow exp) 1))
 				   (deriv (expon-base exp) var)))))
-
 
 (TEST
  > (deriv '(+ x 3) 'x)
@@ -200,3 +206,4 @@
  (+ x x)
  > (deriv '(+ (** x 2) 30) 'x)
  (* 2 x))
+

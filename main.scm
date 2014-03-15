@@ -171,33 +171,33 @@
 	((=number? pow 0) 1)
 	(else (list '** base pow))))
 
-;; (+ x 3) -> (+ 1 0)
-
-(put 'deriv '+
-     (lambda (exp var)
-       (make-sum (deriv (addend exp) var)
-		 (deriv (augend exp) var))))
-
-(put 'deriv '*
-     (lambda (exp var)
-       (make-sum (make-product (multiplier exp)
-			       (deriv (multiplicand exp) var))
-		 (make-product (deriv (multiplier exp) var)
-			       (multiplicand exp)))))
 
 
 (define-macro* (define-method op+type+args . body)
-  `(put ',())
-  ;; (define-method ((deriv **)  exp var)
-  ;;   )
+  (assert* pair? op+type+args
+	   (lambda-pair ((op+type args))
+		   (mcase op+type
+			  (`(`op `type)
+			   `(put ',op ',type
+				 (lambda ,args ,@body)))))))
 
-  )
-(put 'deriv '**
-     (lambda (exp var)
-       (make-product (expon-pow exp)
-		     (make-product (make-expon (expon-base exp)
-					       (- (expon-pow exp) 1))
-				   (deriv (expon-base exp) var)))))
+;; (+ x 3) -> (+ 1 0)
+
+(define-method ((deriv +) exp var)
+  (make-sum (deriv (addend exp) var)
+	    (deriv (augend exp) var)))
+
+(define-method ((deriv *) exp var)
+  (make-sum (make-product (multiplier exp)
+			  (deriv (multiplicand exp) var))
+	    (make-product (deriv (multiplier exp) var)
+			  (multiplicand exp))))
+
+(define-method ((deriv **) exp var)
+  (make-product (expon-pow exp)
+		(make-product (make-expon (expon-base exp)
+					  (- (expon-pow exp) 1))
+			      (deriv (expon-base exp) var))))
 
 (TEST
  > (deriv '(+ x 3) 'x)

@@ -25,15 +25,23 @@
 
 
 (define (attach-tag type-tag contents)
-  (cons type-tag contents))
+  (if (eq? type-tag 'scheme-number)
+      contents
+      (cons type-tag contents)))
+
 (define (type-tag datum)
-  (if (pair? datum)
-      (car datum)
-      (error "Bad tagged datum -- TYPE-TAG" datum)))
+  (cond ((pair? datum)
+	 (car datum))
+	((number? datum)
+	 'scheme-number)
+	(else
+	 (error "Bad tagged datum -- TYPE-TAG" datum))))
 (define (contents datum)
-  (if (pair? datum)
-      (cdr datum)
-      (error "Bad tagged datum -- CONTENTS" datum)))
+  (cond ((pair? datum)
+	 (cdr datum))
+	((number? datum) datum)
+	(else
+	 (error "Bad tagged datum -- CONTENTS" datum))))
 
 
 
@@ -145,7 +153,23 @@
   (put 'real-part '(complex) real-part)
   (put 'imag-part '(complex) imag-part)
   'done)
-  
+
+(define (install-scheme-number-package)
+  (define (tag x)
+    (attach-tag 'scheme-number x))    
+  (put 'add '(scheme-number scheme-number)
+       (lambda (x y) (tag (+ x y))))
+  (put 'sub '(scheme-number scheme-number)
+       (lambda (x y) (tag (- x y))))
+  (put 'mul '(scheme-number scheme-number)
+       (lambda (x y) (tag (* x y))))
+  (put 'div '(scheme-number scheme-number)
+       (lambda (x y) (tag (/ x y))))
+  (put 'make 'scheme-number
+       (lambda (x) (tag x)))
+  'done)
+
+
 (define (add x y) (apply-generic 'add x y))
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
@@ -155,7 +179,14 @@
 (install-rectangular-package)
 (install-polar-package)
 (install-complex-package)
-  
+(install-scheme-number-package)
+
 (define louis-reasoner-z (make-complex-from-real-imag 3 4))
 
-;; (mul louis-reasoner-z 5)
+
+(TEST
+ > (mul 5 3)
+ 15
+ > (mul 2 (mul 5 3))
+ 30)
+

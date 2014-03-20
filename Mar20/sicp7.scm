@@ -76,6 +76,14 @@
        (lambda (x y) (tag (make-from-real-imag x y))))
   (put 'make-from-mag-ang 'rectangular 
        (lambda (r a) (tag (make-from-mag-ang r a))))
+  (put 'equ? '(rectangular rectangular)
+       (lambda (x y)
+	 (and (= (real-part x) (real-part y))
+	      (= (imag-part x) (imag-part y)))))
+  (put 'zero? '(rectangular)
+       (lambda (x)
+	 (and (zero? (real-part x))
+	      (zero? (imag-part x)))))
   'done)
 
 (define (install-polar-package)
@@ -100,6 +108,15 @@
        (lambda (x y) (tag (make-from-real-imag x y))))
   (put 'make-from-mag-ang 'polar 
        (lambda (r a) (tag (make-from-mag-ang r a))))
+  (put 'equ? '(polar polar)
+       (lambda (x y)
+	 (or (and (zero? (magnitude x))
+		  (zero? (magnitude y)))
+	     (and (= (magnitude x) (magnitude y))
+		  (= (angle x) (angle y))))))
+  (put 'zero? '(polar)
+       (lambda (x)
+	 (zero? (magnitude x))))
   'done)
 
 
@@ -113,6 +130,13 @@
 (define (magnitude z) (apply-generic 'magnitude z))
 (define (angle z) (apply-generic 'angle z))
 
+(define (add x y) (apply-generic 'add x y))
+(define (sub x y) (apply-generic 'sub x y))
+(define (mul x y) (apply-generic 'mul x y))
+(define (div x y) (apply-generic 'div x y))
+(define (equ? x y) (apply-generic 'equ? x y))
+(define (=zero? x) (apply-generic 'zero? x))
+ 
 
 (define (install-complex-package)
   ;; imported procedures from rectangular and polar packages
@@ -152,6 +176,8 @@
   (put 'angle '(complex) angle)
   (put 'real-part '(complex) real-part)
   (put 'imag-part '(complex) imag-part)
+  (put 'equ? '(complex complex) equ?)
+  (put 'zero? '(complex) =zero?)
   'done)
 
 (define (install-scheme-number-package)
@@ -165,16 +191,11 @@
        (lambda (x y) (tag (* x y))))
   (put 'div '(scheme-number scheme-number)
        (lambda (x y) (tag (/ x y))))
-  (put 'make 'scheme-number
+  (put 'make '(scheme-number)
        (lambda (x) (tag x)))
+  (put 'equ? '(scheme-number) =)
+  (put 'zero? '(scheme-number) zero?)
   'done)
-
-
-(define (add x y) (apply-generic 'add x y))
-(define (sub x y) (apply-generic 'sub x y))
-(define (mul x y) (apply-generic 'mul x y))
-(define (div x y) (apply-generic 'div x y))
- 
   
 (install-rectangular-package)
 (install-polar-package)
@@ -190,3 +211,27 @@
  > (mul 2 (mul 5 3))
  30)
 
+(TEST
+ > (=zero? 4)
+ #f
+ > (=zero? 0)
+ #t
+ > (=zero? (make-complex-from-real-imag 4 9))
+ #f
+ > (=zero? (make-complex-from-real-imag 0 9))
+ #f
+ > (=zero? (make-complex-from-real-imag 9 0))
+ #f
+ > (=zero? (make-complex-from-real-imag 0 0))
+ #t
+ > (=zero? (make-complex-from-mag-ang 0 0))
+ #t
+ > (=zero? (make-complex-from-mag-ang 4 0))
+ #f
+ > (=zero? (make-complex-from-mag-ang 0 4))
+ #t
+ > (equ? (make-complex-from-mag-ang 0 4) (make-complex-from-mag-ang 0 5))
+ #t
+ > (equ? (make-complex-from-mag-ang 0 4) (make-complex-from-mag-ang 5 0))
+ #f
+ )

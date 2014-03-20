@@ -157,6 +157,9 @@
   (define (div-complex z1 z2)
     (make-from-mag-ang (/ (magnitude z1) (magnitude z2))
                        (- (angle z1) (angle z2))))
+  (define (mixed-equ? x y)
+    (and (= (real-part x) (real-part y))
+	 (= (imag-part x) (imag-part y))))
   ;; interface to rest of the system
   (define (tag z) (attach-tag 'complex z))
   (put 'add '(complex complex)
@@ -177,6 +180,8 @@
   (put 'real-part '(complex) real-part)
   (put 'imag-part '(complex) imag-part)
   (put 'equ? '(complex complex) equ?)
+  (put 'equ? '(polar rectangular) mixed-equ?)
+  (put 'equ? '(rectangular polar) mixed-equ?)
   (put 'zero? '(complex) =zero?)
   'done)
 
@@ -234,4 +239,7 @@
  #t
  > (equ? (make-complex-from-mag-ang 0 4) (make-complex-from-mag-ang 5 0))
  #f
+ ;; mixed:
+ > (equ? (make-complex-from-mag-ang 0 4) (make-complex-from-real-imag 0 0))
+ #t
  )

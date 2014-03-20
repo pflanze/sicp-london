@@ -1,5 +1,11 @@
 
-;; book
+
+(define empty-set '())
+(define empty-set? null?)
+
+;; http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-16.html#%_sec_2.3.3
+;; Sets as binary trees
+
 (define (entry tree) (car tree))
 (define (left-branch tree) (cadr tree))
 (define (right-branch tree) (caddr tree))
@@ -7,30 +13,40 @@
   (list entry left right))
 
 (define (element-of-set? x set)
-  (cond ((null? set) #f)
+  (cond ((empty-set? set) #f)
         ((= x (entry set)) #t)
         ((< x (entry set))
          (element-of-set? x (left-branch set)))
         ((> x (entry set))
          (element-of-set? x (right-branch set)))))
 
+(define (adjoin-set x set)
+  (cond ((null? set) (make-tree x '() '()))
+        ((= x (entry set)) set)
+        ((< x (entry set))
+         (make-tree (entry set) 
+                    (adjoin-set x (left-branch set))
+                    (right-branch set)))
+        ((> x (entry set))
+         (make-tree (entry set)
+                    (left-branch set)
+                    (adjoin-set x (right-branch set))))))
+
 ;; union-set
 ;; intersection-set
 
 ;; bonus: O(n)
 
-(define empty-tree '())
-
 (define t1
   (make-tree 5
 	     (make-tree 4
-			(make-tree 3 empty-tree empty-tree)
-			empty-tree)
+			(make-tree 3 empty-set empty-set)
+			empty-set)
 	     (make-tree 7
-			empty-tree
+			empty-set
 			(make-tree 10
-				   (make-tree 8 empty-tree empty-tree)
-				   (make-tree 11 empty-tree empty-tree)))))
+				   (make-tree 8 empty-set empty-set)
+				   (make-tree 11 empty-set empty-set)))))
 
 
 (TEST
@@ -76,14 +92,18 @@
                       remaining-elts))))))))
 
 (TEST
+ > (list->tree '(1 2 3 4 5 6 7))
+ (4 (2 (1 () ()) (3 () ())) (6 (5 () ()) (7 () ())))
+ ;; hm
+ 
  > (define t2 (list->tree '(1 4 5 9 38)))
  )
 
 
 (define (union-sorted a b)
-  (cond ((null? a)
+  (cond ((empty-set? a)
 	 b)
-	((null? b)
+	((empty-set? b)
 	 a)
 	(else
 	 (cond ((= (car a) (car b))
@@ -118,18 +138,18 @@
   (list->tree (union-sorted (tree->list a) (tree->list b))))
 
 (define (union-tree a b)
-  (cond ((null? a) b)
-	((null? b) a)
+  (cond ((empty-set? a) b)
+	((empty-set? b) a)
 	(else
 	 (let ((make
 		   (lambda (t1 t2) ;; t1 has smaller entry than t2
-		     (tree-add (entry t1)
-			       (tree-add (entry t2)
-					 (union-tree
-					  (union-tree (right-branch t1)
-						      (left-branch t2))
-					  (union-tree (left-branch t1)
-						      (right-branch t2))))))))
+		     (adjoin-set (entry t1)
+				 (adjoin-set (entry t2)
+					     (union-tree
+					      (union-tree (right-branch t1)
+							  (left-branch t2))
+					      (union-tree (left-branch t1)
+							  (right-branch t2))))))))
 	   (cond ((= (entry a) (entry b))
 		  (make-tree (entry a)
 			     (union-tree (left-branch a)
@@ -153,5 +173,42 @@
  (1 4 5 9 38)
  > (tree->list (union-tree t1 t2))
  (1 3 4 5 7 8 9 10 11 38)
+ )
+
+
+;; ---- more tests: ---------------------------------------------
+
+(define (randomtree add start n)
+  (let ((is (map (lambda (_) (random-integer n)) (iota n))))
+    (values is
+	    (fold add start is))))
+
+;; an |and| that errors for non-true values
+(define-macro* (xand . es)
+  (let rec ((es es))
+    (if (null? es)
+	`#t
+	`(if ,(car es)
+	     ,(rec (cdr es))
+	     ;; XX only carry over location!  location-error, pls
+	     (source-error (source-dequote ',(source-quote (car es)))
+			   "xand: got false")))))
+
+(define (rtest n)
+  (letv ((is t) (randomtree adjoin-set empty-set n))
+	(let ((s0 (list-uniq = (sort is <))))
+	  (xand (equal? s0 (tree->list t))
+		(let ((all (iota n)))
+		  (letv ((is2 nonis) (partition (C element-of-set? _ t) all))
+			(xand (equal? is2 s0)
+			      (equal? (sort (append s0 nonis) <) all))))))))
+
+(TEST
+ > (rtest 100)
+ #t
+ > (rtest 1000)
+ #t
+ > (rtest 10000)
+ #t
  )
 

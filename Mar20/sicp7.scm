@@ -95,6 +95,17 @@
   'done)
 
 
+
+(define (make-complex-from-real-imag x y)
+  ((get 'make-from-real-imag 'complex) x y))
+(define (make-complex-from-mag-ang r a)
+  ((get 'make-from-mag-ang 'complex) r a))
+(define (real-part z) (apply-generic 'real-part z))
+(define (imag-part z) (apply-generic 'imag-part z))
+(define (magnitude z) (apply-generic 'magnitude z))
+(define (angle z) (apply-generic 'angle z))
+
+
 (define (install-complex-package)
   ;; imported procedures from rectangular and polar packages
   (define (make-from-real-imag x y)
@@ -128,6 +139,11 @@
        (lambda (x y) (tag (make-from-real-imag x y))))
   (put 'make-from-mag-ang 'complex
        (lambda (r a) (tag (make-from-mag-ang r a))))
+  ;; and delegates:
+  (put 'magnitude '(complex) magnitude)
+  (put 'angle '(complex) angle)
+  (put 'real-part '(complex) real-part)
+  (put 'imag-part '(complex) imag-part)
   'done)
   
 (define (add x y) (apply-generic 'add x y))
@@ -139,16 +155,6 @@
 (install-rectangular-package)
 (install-polar-package)
 (install-complex-package)
-
-(define (make-complex-from-real-imag x y)
-  ((get 'make-from-real-imag 'complex) x y))
-(define (make-complex-from-mag-ang r a)
-  ((get 'make-from-mag-ang 'complex) r a))
-(define (real-part z) (apply-generic 'real-part z))
-(define (imag-part z) (apply-generic 'imag-part z))
-(define (magnitude z) (apply-generic 'magnitude z))
-(define (angle z) (apply-generic 'angle z))
-
   
 (define louis-reasoner-z (make-complex-from-real-imag 3 4))
 

@@ -1,4 +1,7 @@
-#lang racket
+(define make-hash make-table)
+(define hash-set! table-set!)
+(define hash-ref table-ref)
+
 (define (square x) (* x x))
 
 (define (make-from-real-imag x y)
@@ -14,9 +17,10 @@
   
   
 (define +optable+ (make-hash))
-(define (put op type proc) (hash-set! +optable+ (list op type)
-proc))
-(define (get op type) (hash-ref +optable+ (list op type)))
+(define (put op type proc)
+  (hash-set! +optable+ (list op type) proc))
+(define (get op type)
+  (hash-ref +optable+ (list op type)))
 
 
 
@@ -147,3 +151,5 @@ proc))
 
   
 (define louis-reasoner-z (make-complex-from-real-imag 3 4))
+
+

@@ -100,22 +100,10 @@
   ((get 'make-from-real-imag 'complex) x y))
 (define (make-complex-from-mag-ang r a)
   ((get 'make-from-mag-ang 'complex) r a))
-(define (real-part z)
-  (cond ((number? z) z)
-	(else
-	 (apply-generic 'real-part z))))
-(define (imag-part z)
-  (cond ((number? z) 0)
-	(else
-	 (apply-generic 'imag-part z))))
-(define (magnitude z)
-  (cond ((number? z) z)
-	(else
-	 (apply-generic 'magnitude z))))
-(define (angle z)
-  (cond ((number? z) 0)
-	(else
-	 (apply-generic 'angle z))))
+(define (real-part z) (apply-generic 'real-part z))
+(define (imag-part z) (apply-generic 'imag-part z))
+(define (magnitude z) (apply-generic 'magnitude z))
+(define (angle z) (apply-generic 'angle z))
 
 
 (define (install-complex-package)
@@ -158,9 +146,7 @@
   (put 'imag-part '(complex) imag-part)
   'done)
   
-(define (add x y)
-  (cond ((number? ))
-	(else (apply-generic 'add x y))))
+(define (add x y) (apply-generic 'add x y))
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))

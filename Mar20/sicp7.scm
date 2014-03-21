@@ -37,6 +37,7 @@
 	 'scheme-number)
 	(else
 	 (error "Bad tagged datum -- TYPE-TAG" datum))))
+
 (define (contents datum)
   (cond ((pair? datum)
 	 (cdr datum))
@@ -44,21 +45,26 @@
 	(else
 	 (error "Bad tagged datum -- CONTENTS" datum))))
 
-
+(define (on-contents-1 fn)
+  (lambda (x)
+    (fn (contents x))))
+(define (on-contents-2 fn)
+  (lambda (x y)
+    (fn (contents x) (contents y))))
 
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
       (if proc
-          (apply proc (map contents args))
+          (apply proc args)
           (error
             "No method for these types -- APPLY-GENERIC"
             (list op type-tags))))))
 
 (define (install-rectangular-package)
   ;; internal procedures
-  (define (real-part z) (car z))
-  (define (imag-part z) (cdr z))
+  (define (real-part z) (car (contents z)))
+  (define (imag-part z) (cdr (contents z)))
   (define (make-from-real-imag x y) (cons x y))
   (define (magnitude z)
     (sqrt (+ (square (real-part z))
@@ -89,8 +95,8 @@
 
 (define (install-polar-package)
   ;; internal procedures
-  (define (magnitude z) (car z))
-  (define (angle z) (cdr z))
+  (define (magnitude z) (car (contents z)))
+  (define (angle z) (cdr (contents z)))
   (define (make-from-mag-ang r a) (cons r a))
   (define (real-part z)
     (* (magnitude z) (cos (angle z))))
@@ -176,14 +182,14 @@
   (put 'make-from-mag-ang 'complex
        (lambda (r a) (tag (make-from-mag-ang r a))))
   ;; and delegates:
-  (put 'magnitude '(complex) magnitude)
-  (put 'angle '(complex) angle)
-  (put 'real-part '(complex) real-part)
-  (put 'imag-part '(complex) imag-part)
-  (put 'equ? '(complex complex) equ?)
+  (put 'magnitude '(complex) (on-contents-1 magnitude))
+  (put 'angle '(complex) (on-contents-1 angle))
+  (put 'real-part '(complex) (on-contents-1 real-part))
+  (put 'imag-part '(complex) (on-contents-1 imag-part))
+  (put 'equ? '(complex complex) (on-contents-2 equ?))
   (put 'equ? '(polar rectangular) mixed-equ?)
   (put 'equ? '(rectangular polar) mixed-equ?)
-  (put 'zero? '(complex) =zero?)
+  (put 'zero? '(complex) (on-contents-1 =zero?))
   'done)
 
 (define (install-scheme-number-package)

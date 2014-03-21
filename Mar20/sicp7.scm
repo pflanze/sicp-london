@@ -1,6 +1,7 @@
 (define make-hash make-table)
 (define hash-set! table-set!)
-(define hash-ref table-ref)
+(define (hash-ref t k)
+  (table-ref t k #f))
 
 (define (square x) (* x x))
 

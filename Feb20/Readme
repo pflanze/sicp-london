@@ -1,0 +1,37 @@
+Special Session: Continuations programming in racket 
+
+We're taking a break from SICP for one week to look at continuations;
+they're a sort of grand-daddy of control structure (for-loops,
+exceptions, et cetera) in programming languages.  In a brief (and
+mostly wrong) nutshell, continuations are an abstraction of the
+current state of a computation.
+
+When languages, like Racket and Scheme, make continuations a
+first-class object, the program can stop its own execution, save it,
+and pass it around in functions and macros, and perform
+transformations on it.  First class continuations allow a program to
+modify its own execution on the fly.
+
+One might use continuations in a compiler design to implement lower
+level control structures, like exceptions, or use them more
+practically, like to control the state of threads in a web server,
+which is done in the Racket standard library.
+
+In this session we'll begin with a 20-30min intro to continuations,
+followed by our usual dojo - working through 2-3 problems in a
+pair-programming fashion.  Here's some suggested reading to help you
+prep:
+
+Continuation passing style by example in javascript - Matt Might
+ http://matt.might.net/articles/by-example-continuation-passing-style/
+
+Racket Guide on Continuations - Racket docs
+ http://docs.racket-lang.org/guide/conts.html
+
+Systems programming in racket - Racket docs (practical, real-world 
+ use of continuations)
+ http://docs.racket-lang.org/more/index.html
+
+Of course, since this is a special session, there's no need for you to
+do any SICP prep before joining us.  If you haven't joined us before,
+this is the perfect time.

@@ -1,0 +1,8 @@
+Sec 2.3.1-2.3.3
+
+We're back in SICP, section 2.3 on symbolic data (finally doing
+something other than numbers!)
+
+This section has some fun examples: symbolic differentiation,
+implementing sets, implementing Huffman encoding trees.  Please read
+through 2.3.1 - 2.3.3 before coming.

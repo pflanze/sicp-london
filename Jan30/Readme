@@ -1,0 +1,18 @@
+Sec 2.2, part II
+
+Sec 2.2 introduces several "famous" functional idioms, including the
+map and reduce function (the MapReduce algorithm is beyond the scope
+of this study group, but it's inspired by this idea.)
+
+[Never joined us before?  No worries!  Our "problem class" sessions are
+pretty drop-in friendly.  You'll need:
+
+• A scheme or racket repl (e.g. from a laptop)
+
+• To read SICP, sec.2.2, or watch the lectures 
+
+• To brush up on SICP Ch1 - know how to define functions, use lambdas
+  and let, and know the difference between iteration and recursion.
+
+Any questions, let me know.  See you then.]
+

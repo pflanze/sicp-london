@@ -1,0 +1,22 @@
+Section 1.1 and 1.2 
+
+NOTE: Postponed one week due to Hacker News.
+
+We're resuming our SICP study in January starting from Ch2.  But for
+those who are just joining us now, or who need a refresher, we're
+running 4 sessions on Ch1 before the Christmas holidays.
+
+Coding Dojo on Section 1.2
+
+This week we're working through the first section of the first
+chapter: Section 1.1: The Elements of Programming and Section 2.2:
+Procedures and the processes they generate
+ http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1
+ http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2
+
+Please read through it before coming. You may also wish to watch the
+Video Lecture for this section.
+ http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/video-lectures/1a-overview-and-introduction-to-lisp/
+
+Please remember to bring a laptop with racket
+(http://racket-lang.org/) installed.

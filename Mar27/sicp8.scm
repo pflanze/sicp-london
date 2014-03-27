@@ -23,11 +23,11 @@
 (define (get op type)
   (hash-ref +optable+ (list op type)))
 
-(define +coericion-table+ (make-hash))
+(define +coercion-table+ (make-hash))
 (define (put-coercion type1 type2 proc)
-  (hash-set! +coericion-table+ (list type1 type2) proc))
+  (hash-set! +coercion-table+ (list type1 type2) proc))
 (define (get-coercion type1 type2) 
-  (hash-ref +coericion-table+ (list type1 type2)))
+  (hash-ref +coercion-table+ (list type1 type2)))
 
 
 

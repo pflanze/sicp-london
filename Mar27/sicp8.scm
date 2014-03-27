@@ -23,6 +23,12 @@
 (define (get op type)
   (hash-ref +optable+ (list op type)))
 
+(define +coericion-table+ (make-hash))
+(define (put-coercion type1 type2 proc)
+  (hash-set! +coericion-table+ (list type1 type2) proc))
+(define (get-coercion type1 type2) 
+  (hash-ref +coericion-table+ (list type1 type2)))
+
 
 
 (define (attach-tag type-tag contents)
@@ -57,9 +63,28 @@
     (let ((proc (get op type-tags)))
       (if proc
           (apply proc args)
-          (error
-            "No method for these types -- APPLY-GENERIC"
-            (list op type-tags))))))
+          (if (= (length args) 2)
+              (let ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (let ((t1->t2 (get-coercion type1 type2))
+                      (t2->t1 (get-coercion type2 type1)))
+                  (cond (t1->t2
+                         (apply-generic op (t1->t2 a1) a2))
+                        (t2->t1
+                         (apply-generic op a1 (t2->t1 a2)))
+                        (else
+                         (error "No method for these types"
+                                (list op type-tags))))))
+              (error "No method for these types"
+                     (list op type-tags)))))))
+
+(define (scheme-number->complex n)
+  (make-complex-from-real-imag (contents n) 0))
+
+(put-coercion 'scheme-number 'complex scheme-number->complex)
+
 
 (define (install-rectangular-package)
   ;; internal procedures
@@ -271,6 +296,7 @@
 (install-rectangular-package)
 (install-polar-package)
 (install-complex-package)
+(install-rational-package)
 (install-scheme-number-package)
 
 (define louis-reasoner-z (make-complex-from-real-imag 3 4))
@@ -309,3 +335,17 @@
  > (equ? (make-complex-from-mag-ang 0 4) (make-complex-from-real-imag 0 0))
  #t
  )
+
+
+(define (exp x y) (apply-generic 'exp x y))
+(put 'exp '(scheme-number scheme-number)
+     (lambda (x y) (tag (expt x y)))) ; using primitive expt
+(define (scheme-number->scheme-number n) n)
+(define (complex->complex z) z)
+(put-coercion 'scheme-number 'scheme-number
+              scheme-number->scheme-number)
+(put-coercion 'complex 'complex complex->complex)
+
+
+(add (make-scheme-number 5) louis-reasoner-z)
+

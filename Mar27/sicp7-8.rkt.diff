@@ -1,5 +1,5 @@
 --- /dev/fd/63	2014-03-27 01:51:25.636792038 +0000
-+++ sicp8.rkt	2014-03-27 01:38:25.000000000 +0000
++++ sicp8.scm	2014-03-27 01:38:25.000000000 +0000
 @@ -16,9 +16,16 @@
  (define +optable+ (make-hash))
  (define (put op type proc) (hash-set! +optable+ (list op type)

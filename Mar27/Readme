@@ -1,1 +1,11 @@
 Sec 2.5.2-2.5.3
+
+We're going deeper into data types this week with generic operations
+on multiple types.  No background slides, but do see the source code
+file (Slightly different from last week).
+
+We start at 7pm - meet in the reception of the CSG building and I'll
+come down to pick you up just after the top of the hour.  Bring a
+laptop with a racket repl loaded with the source and we'll work on a
+few problems in pairs for 2 hrs.
+

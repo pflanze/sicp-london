@@ -123,22 +123,6 @@
       (append (encode-symbol (car message) tree)
               (encode (cdr message) tree))))
 
-;; proc that returns the list of bits that encodes a given symbol according to a given tree.
-;; solution ripped from web
-;; (define (encode-symbol symb tree) 
-;;   (define (branch-correct? branch) 
-;;     (if (leaf? branch) 
-;;         (equal? symb (symbol-leaf branch)) 
-;;         (element-of-set? symb (symbols branch)))) 
-  
-;;   (let ((lb (left-branch tree)) 
-;;         (rb (right-branch tree))) 
-;;     (cond ((branch-correct? lb) 
-;;            (if (leaf? lb) '(0) (cons 0 (encode-symbol symb lb)))) 
-;;           ((branch-correct? rb) 
-;;            (if (leaf? rb) '(1) (cons 1 (encode-symbol symb rb)))) 
-;;           (else (error "bad symbol -- ENCODE-SYMBOL" symb)))))
-
 (define (encode-symbol sym tree)
   (cond ((leaf? tree) '())
 	((element-of-set? sym (symbols (left-branch tree)))
@@ -148,10 +132,6 @@
 	(else
 	 (error "??"))))
 
-
-;; tests
-(encode '(A D A B B C A) sample-tree) 
-(equal? sample-bits (encode sample-message sample-tree))
 
 ;; ex 2.69. 
 ;; The following procedure takes as its argument a list of symbol-frequency pairs
@@ -182,12 +162,12 @@
       set  
       (subset (cdr set) (- n 1))))
 
+
+;; --------------------------------------------------------------------
 ;; tests
 (NOTE " ++ successive merge")
 (define test-tree (generate-huffman-tree '((A 3) (B 5) (C 6) (D 6)))) 
 
-
-;; --------------------------------------------------------------------
 
 (define (random-mesg len numsyms)
   (define syms (list->vector (map (lambda (x)
@@ -198,6 +178,9 @@
        (iota len)))
 
 (TEST
+ > (encode '(A D A B B C A) sample-tree) 
+ > (equal? sample-bits (encode sample-message sample-tree))
+ #t
  > (encode '(A B C D) test-tree)
  (0 0 0 1 1 1 1 0)
  > (decode # test-tree)

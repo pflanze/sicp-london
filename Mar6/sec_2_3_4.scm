@@ -87,6 +87,11 @@
                     (adjoin-set x (cdr set))))))
 
 ;; takes a set of pairs ex  ((A 4) (B 2) (C 1) (D 1)) and constructs an initial set of leaves
+
+;; "constructs an initial ordered set of leaves, ready to be merged
+;; according to the Huffman algorithm"
+;; Those with the lowest weights come *first*
+
 (define (make-leaf-set pairs)
   (if (null? pairs)
       '()
@@ -153,8 +158,13 @@
 
 ;; take '((A 3) (B 5) (C 6) (D 6)), merge those subtrees with (equal?) lowest weights
 
-(define (successive-merge what)
-  ?)
+(define (successive-merge leafset)
+  (let ((t (make-code-tree (car leafset)
+			   (cadr leafset)))
+	(rest (cddr leafset)))
+    (if (null? rest)
+	t
+	(successive-merge (cons t rest)))))
 
 
 ;; --------------------------------------------------------------------

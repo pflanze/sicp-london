@@ -6,11 +6,14 @@
 ;; http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-16.html#%_sec_2.3.3
 ;; Sets as binary trees
 
-(define (entry tree) (car tree))
-(define (left-branch tree) (cadr tree))
-(define (right-branch tree) (caddr tree))
-(define (make-tree entry left right)
-  (list entry left right))
+(define-struct tree
+  entry
+  left
+  right)
+
+(define entry tree-entry)
+(define left-branch tree-left)
+(define right-branch tree-right)
 
 (define (element-of-set? x set)
   (cond ((empty-set? set) #f)
@@ -92,9 +95,13 @@
                       remaining-elts))))))))
 
 (TEST
- > (list->tree '(1 2 3 4 5 6 7))
- (4 (2 (1 () ()) (3 () ())) (6 (5 () ()) (7 () ())))
+ ;; > (list->tree '(1 2 3 4 5 6 7))
+ ;; (4 (2 (1 () ()) (3 () ())) (6 (5 () ()) (7 () ())))
  ;; hm
+ ;; #(tree
+ ;;   4
+ ;;   #(tree 2 #(tree 1 () ()) #(tree 3 () ()))
+ ;;   #(tree 6 #(tree 5 () ()) #(tree 7 () ())))
  
  > (define t2 (list->tree '(1 4 5 9 38)))
  )

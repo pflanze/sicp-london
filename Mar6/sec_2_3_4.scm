@@ -101,6 +101,7 @@
  > (adjoin-set '(leaf F 1) t)
  ((leaf F 1) (leaf A 3) (leaf B 3) (leaf C 4) (leaf E 10))
  )
+
 ;; takes a set of pairs ex  ((A 4) (B 2) (C 1) (D 1)) and constructs an initial set of leaves
 
 ;; "constructs an initial ordered set of leaves, ready to be merged
@@ -180,7 +181,7 @@
 ;;    (step)
     (if (null? rest)
 	t
-	(successive-merge (cons t rest)))))
+	(successive-merge (adjoin-set t rest)))))
 
 
 ;; --------------------------------------------------------------------

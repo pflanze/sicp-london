@@ -187,7 +187,7 @@
 ;; --------------------------------------------------------------------
 ;; tests
 (NOTE " ++ successive merge")
-(define test-tree (generate-huffman-tree '((A 3) (B 5) (C 6) (D 6)))) 
+(define test-tree (generate-huffman-tree '((B 5) (A 3) (D 6) (C 6)))) 
 
 
 (define (random-mesg len numsyms)

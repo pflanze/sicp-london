@@ -203,7 +203,7 @@
  > (equal? sample-bits (encode sample-message sample-tree))
  #t
  > (encode '(A B C D) test-tree)
- (0 0 0 1 1 1 1 0)
+ (0 0 0 1 1 0 1 1)
  > (decode # test-tree)
  (A B C D)
 

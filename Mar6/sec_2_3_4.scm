@@ -186,9 +186,30 @@
 (NOTE " ++ successive merge")
 (define test-tree (generate-huffman-tree '((A 3) (B 5) (C 6) (D 6)))) 
 
+
+;; --------------------------------------------------------------------
+
+(define (random-mesg len numsyms)
+  (define syms (list->vector (map (lambda (x)
+				    (string.symbol (string (.char (+ (.integer #\A) x)))))
+				  (iota numsyms))))
+  (map (lambda (_)
+	 (vector-ref syms (random-integer numsyms)))
+       (iota len)))
+
 (TEST
  > (encode '(A B C D) test-tree)
  (0 0 0 1 1 1 1 0)
  > (decode # test-tree)
  (A B C D)
+
+ > (define (test len numsyms)
+     (let* ((m (random-mesg len numsyms))
+	    (e (encode m test-tree)))
+       ;;(step)
+       (equal? m (decode e test-tree))))
+ > (test 20 4)
+ #t
+ > (test 200 3)
+ #t
  )

@@ -11,29 +11,25 @@
   left
   right)
 
-(define entry tree-entry)
-(define left-branch tree-left)
-(define right-branch tree-right)
-
 (define (element-of-set? x set)
   (cond ((empty-set? set) #f)
-        ((= x (entry set)) #t)
-        ((< x (entry set))
-         (element-of-set? x (left-branch set)))
-        ((> x (entry set))
-         (element-of-set? x (right-branch set)))))
+        ((= x (tree-entry set)) #t)
+        ((< x (tree-entry set))
+         (element-of-set? x (tree-left set)))
+        ((> x (tree-entry set))
+         (element-of-set? x (tree-right set)))))
 
 (define (adjoin-set x set)
   (cond ((null? set) (make-tree x '() '()))
-        ((= x (entry set)) set)
-        ((< x (entry set))
-         (make-tree (entry set) 
-                    (adjoin-set x (left-branch set))
-                    (right-branch set)))
-        ((> x (entry set))
-         (make-tree (entry set)
-                    (left-branch set)
-                    (adjoin-set x (right-branch set))))))
+        ((= x (tree-entry set)) set)
+        ((< x (tree-entry set))
+         (make-tree (tree-entry set) 
+                    (adjoin-set x (tree-left set))
+                    (tree-right set)))
+        ((> x (tree-entry set))
+         (make-tree (tree-entry set)
+                    (tree-left set)
+                    (adjoin-set x (tree-right set))))))
 
 ;; union-set
 ;; intersection-set
@@ -132,9 +128,9 @@
   (define (copy-to-list tree result-list)
     (if (null? tree)
         result-list
-        (copy-to-list (left-branch tree)
-                      (cons (entry tree)
-                            (copy-to-list (right-branch tree)
+        (copy-to-list (tree-left tree)
+                      (cons (tree-entry tree)
+                            (copy-to-list (tree-right tree)
                                           result-list)))))
   (copy-to-list tree '()))
 
@@ -150,22 +146,22 @@
 	(else
 	 (let ((make
 		   (lambda (t1 t2) ;; t1 has smaller entry than t2
-		     (adjoin-set (entry t1)
-				 (adjoin-set (entry t2)
+		     (adjoin-set (tree-entry t1)
+				 (adjoin-set (tree-entry t2)
 					     (union-tree
-					      (union-tree (right-branch t1)
-							  (left-branch t2))
-					      (union-tree (left-branch t1)
-							  (right-branch t2))))))))
-	   (cond ((= (entry a) (entry b))
-		  (make-tree (entry a)
-			     (union-tree (left-branch a)
-					 (left-branch b))
-			     (union-tree (right-branch a)
-					 (right-branch b))))
+					      (union-tree (tree-right t1)
+							  (tree-left t2))
+					      (union-tree (tree-left t1)
+							  (tree-right t2))))))))
+	   (cond ((= (tree-entry a) (tree-entry b))
+		  (make-tree (tree-entry a)
+			     (union-tree (tree-left a)
+					 (tree-left b))
+			     (union-tree (tree-right a)
+					 (tree-right b))))
 		 ;; Strategy?
 		 ;; - pick 
-		 ((< (entry a) (entry b))
+		 ((< (tree-entry a) (tree-entry b))
 		  ;; now ?
 		  ;; We need to make at least one of a or b smaller.
 		  (make a b))

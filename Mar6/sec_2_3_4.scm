@@ -87,15 +87,15 @@
                     (adjoin-set x (cdr set))))))
 
 (TEST
- > (adjoin-set '(leaf A 3) '())
- ((leaf A 3))
- > (adjoin-set '(leaf B 3) #)
- ((leaf A 3) (leaf B 3))
- > (adjoin-set '(leaf C 4) #)
- ((leaf A 3) (leaf B 3) (leaf C 4))
- > (adjoin-set '(leaf E 10) #)
+ > (define flipped-adjoin-set (flip adjoin-set))
+ > (define t
+     (chain '()
+	    (flipped-adjoin-set '(leaf A 3))
+	    (flipped-adjoin-set '(leaf B 3))
+	    (flipped-adjoin-set '(leaf C 4))
+	    (flipped-adjoin-set '(leaf E 10))))
+ > t
  ((leaf A 3) (leaf B 3) (leaf C 4) (leaf E 10))
- > (define t #)
  > (adjoin-set '(leaf F 11) t)
  ((leaf A 3) (leaf B 3) (leaf C 4) (leaf E 10) (leaf F 11))
  > (adjoin-set '(leaf F 1) t)

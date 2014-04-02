@@ -1,4 +1,10 @@
-#lang racket
+
+;;(define displayln println)
+(define (displayln . args)
+  (for-each write args)
+  (newline))
+(define false #f)
+
 ;; Huffman use variable-length prefix codes that take advantage 
 ;; of the relative frequencies of the symbols in the messages to be encoded
 

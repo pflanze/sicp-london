@@ -4,6 +4,8 @@
   (for-each write args)
   (newline))
 (define false #f)
+(define (NOTE . args)
+  (void))
 
 ;; Huffman use variable-length prefix codes that take advantage 
 ;; of the relative frequencies of the symbols in the messages to be encoded
@@ -27,9 +29,9 @@
 ;; leaf tests
 (define l (make-leaf 'A 8))
 (define r (make-leaf 'H 1))
-(displayln " ++ leaf")
-(displayln l)
-(displayln r)
+(NOTE " ++ leaf")
+(NOTE l)
+(NOTE r)
 
 ;; A general tree will be a list of a left branch, a right branch,
 ;; a set of symbols, and a weight. The set of symbols will simply 
@@ -55,8 +57,8 @@
 
 ;; tree tests
 (define my-huff (make-code-tree (make-leaf 'A 8) (make-leaf 'B 2)))
-(displayln " ++ code-tree")
-(displayln my-huff)
+(NOTE " ++ code-tree")
+(NOTE my-huff)
 
 
 ;; decode a huffman tree when supplied with a list of 1s and zeros and a Hufftree
@@ -95,7 +97,7 @@
 
 
 ;; Exercise 2.67.  Define an encoding tree and a sample message:
-(displayln " ++ decoding")
+(NOTE " ++ decoding")
 
 (define sample-tree
   (make-code-tree (make-leaf 'A 4)
@@ -103,16 +105,16 @@
                    (make-leaf 'B 2)
                    (make-code-tree (make-leaf 'D 1)
                                    (make-leaf 'C 1)))))
-(displayln " ++ tree")
-(displayln sample-tree)
+(NOTE " ++ tree")
+(NOTE sample-tree)
 
 (define sample-bits '(0 1 1 0 0 1 0 1 0 1 1 1 0))
-(displayln " ++ bits")
-(displayln sample-bits)
+(NOTE " ++ bits")
+(NOTE sample-bits)
 
 (define sample-message (decode sample-bits sample-tree))
-(displayln " ++ result")
-(displayln sample-message)
+(NOTE " ++ result")
+(NOTE sample-message)
 
 ;; Ex 2.68 Encode a message with supplied Huffman tree
 (define (encode message tree)
@@ -171,7 +173,12 @@
       (subset (cdr set) (- n 1))))
 
 ;; tests
-(displayln " ++ successive merge")
+(NOTE " ++ successive merge")
 (define test-tree (generate-huffman-tree '((A 3) (B 5) (C 6) (D 6)))) 
-(encode '(A B C D) test-tree) 
 
+(TEST
+ > (encode '(A B C D) test-tree)
+ (0 0 0 1 1 1 1 0)
+ > (decode # test-tree)
+ (A B C D)
+ )

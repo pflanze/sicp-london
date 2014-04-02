@@ -125,19 +125,29 @@
 
 ;; proc that returns the list of bits that encodes a given symbol according to a given tree.
 ;; solution ripped from web
-(define (encode-symbol symb tree) 
-  (define (branch-correct? branch) 
-    (if (leaf? branch) 
-        (equal? symb (symbol-leaf branch)) 
-        (element-of-set? symb (symbols branch)))) 
+;; (define (encode-symbol symb tree) 
+;;   (define (branch-correct? branch) 
+;;     (if (leaf? branch) 
+;;         (equal? symb (symbol-leaf branch)) 
+;;         (element-of-set? symb (symbols branch)))) 
   
-  (let ((lb (left-branch tree)) 
-        (rb (right-branch tree))) 
-    (cond ((branch-correct? lb) 
-           (if (leaf? lb) '(0) (cons 0 (encode-symbol symb lb)))) 
-          ((branch-correct? rb) 
-           (if (leaf? rb) '(1) (cons 1 (encode-symbol symb rb)))) 
-          (else (error "bad symbol -- ENCODE-SYMBOL" symb)))))                                          
+;;   (let ((lb (left-branch tree)) 
+;;         (rb (right-branch tree))) 
+;;     (cond ((branch-correct? lb) 
+;;            (if (leaf? lb) '(0) (cons 0 (encode-symbol symb lb)))) 
+;;           ((branch-correct? rb) 
+;;            (if (leaf? rb) '(1) (cons 1 (encode-symbol symb rb)))) 
+;;           (else (error "bad symbol -- ENCODE-SYMBOL" symb)))))
+
+(define (encode-symbol sym tree)
+  (cond ((leaf? tree) '())
+	((element-of-set? sym (symbols (left-branch tree)))
+	 (cons 0 (encode-symbol sym (left-branch tree))))
+	((element-of-set? sym (symbols (right-branch tree)))
+	 (cons 1 (encode-symbol sym (right-branch tree))))
+	(else
+	 (error "??"))))
+
 
 ;; tests
 (encode '(A D A B B C A) sample-tree) 

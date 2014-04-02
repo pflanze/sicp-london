@@ -95,6 +95,17 @@
                                (cadr pair))  ; frequency
                     (make-leaf-set (cdr pairs))))))
 
+(TEST
+ > (make-leaf-set '())
+ ()
+ > (make-leaf-set '((A 4)))
+ ((leaf A 4))
+ > (make-leaf-set '((A 4) (B 2)))
+ ((leaf B 2) (leaf A 4))
+ > (make-leaf-set '((A 4) (D 1) (B 2) (C 1)))
+ ((leaf C 1) (leaf D 1) (leaf B 2) (leaf A 4))
+ )
+
 
 ;; Exercise 2.67.  Define an encoding tree and a sample message:
 (NOTE " ++ decoding")
@@ -139,6 +150,11 @@
 ;; tree according to the Huffman algorithm. Write successive-merge
 (define (generate-huffman-tree pairs)
   (successive-merge (make-leaf-set pairs)))
+
+;; take '((A 3) (B 5) (C 6) (D 6)), merge those subtrees with (equal?) lowest weights
+
+(define (successive-merge what)
+  ?)
 
 
 ;; --------------------------------------------------------------------

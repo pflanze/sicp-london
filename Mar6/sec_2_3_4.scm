@@ -86,6 +86,21 @@
         (else (cons (car set)
                     (adjoin-set x (cdr set))))))
 
+(TEST
+ > (adjoin-set '(leaf A 3) '())
+ ((leaf A 3))
+ > (adjoin-set '(leaf B 3) #)
+ ((leaf A 3) (leaf B 3))
+ > (adjoin-set '(leaf C 4) #)
+ ((leaf A 3) (leaf B 3) (leaf C 4))
+ > (adjoin-set '(leaf E 10) #)
+ ((leaf A 3) (leaf B 3) (leaf C 4) (leaf E 10))
+ > (define t #)
+ > (adjoin-set '(leaf F 11) t)
+ ((leaf A 3) (leaf B 3) (leaf C 4) (leaf E 10) (leaf F 11))
+ > (adjoin-set '(leaf F 1) t)
+ ((leaf F 1) (leaf A 3) (leaf B 3) (leaf C 4) (leaf E 10))
+ )
 ;; takes a set of pairs ex  ((A 4) (B 2) (C 1) (D 1)) and constructs an initial set of leaves
 
 ;; "constructs an initial ordered set of leaves, ready to be merged
@@ -162,6 +177,7 @@
   (let ((t (make-code-tree (car leafset)
 			   (cadr leafset)))
 	(rest (cddr leafset)))
+;;    (step)
     (if (null? rest)
 	t
 	(successive-merge (cons t rest)))))

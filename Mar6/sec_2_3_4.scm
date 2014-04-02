@@ -42,7 +42,7 @@
 
 ;; The set of symbols will simply 
 ;; be a simple list of the symbols
-(define (make-code-tree left right)
+(define (code-tree left right)
   (tree left
 	right
 	(append (symbols left) (symbols right))
@@ -62,7 +62,7 @@
 
 
 ;; tree tests
-(define my-huff (make-code-tree (leaf 'A 8) (leaf 'B 2)))
+(define my-huff (code-tree (leaf 'A 8) (leaf 'B 2)))
 (NOTE " ++ code-tree")
 (NOTE my-huff)
 
@@ -114,22 +114,22 @@
 ;; according to the Huffman algorithm"
 ;; Those with the lowest weights come *first*
 
-(define (make-leaf-set pairs)
+(define (leaf-set pairs)
   (if (null? pairs)
       '()
       (let ((pair (car pairs)))
         (adjoin-set (leaf (car pair)	    ; symbol
 			  (cadr pair))	    ; frequency
-                    (make-leaf-set (cdr pairs))))))
+                    (leaf-set (cdr pairs))))))
 
 (TEST
- > (make-leaf-set '())
+ > (leaf-set '())
  ()
- > (make-leaf-set '((A 4)))
+ > (leaf-set '((A 4)))
  (#(leaf A 4))
- > (make-leaf-set '((A 4) (B 2)))
+ > (leaf-set '((A 4) (B 2)))
  (#(leaf B 2) #(leaf A 4))
- > (make-leaf-set '((A 4) (D 1) (B 2) (C 1)))
+ > (leaf-set '((A 4) (D 1) (B 2) (C 1)))
  (#(leaf C 1) #(leaf D 1) #(leaf B 2) #(leaf A 4))
  )
 
@@ -138,11 +138,11 @@
 (NOTE " ++ decoding")
 
 (define sample-tree
-  (make-code-tree (leaf 'A 4)
-                  (make-code-tree
-                   (leaf 'B 2)
-                   (make-code-tree (leaf 'D 1)
-                                   (leaf 'C 1)))))
+  (code-tree (leaf 'A 4)
+	     (code-tree
+	      (leaf 'B 2)
+	      (code-tree (leaf 'D 1)
+			 (leaf 'C 1)))))
 (NOTE " ++ tree")
 (NOTE sample-tree)
 
@@ -176,15 +176,15 @@
 ;; (where no symbol appears in more than one pair) and generates a Huffman encoding
 ;; tree according to the Huffman algorithm. Write successive-merge
 (define (generate-huffman-tree pairs)
-  (successive-merge (make-leaf-set pairs)))
+  (successive-merge (leaf-set pairs)))
 
 ;; take '((A 3) (B 5) (C 6) (D 6)), merge those subtrees with (equal?) lowest weights
 
 (define (successive-merge leafset)
-  (let ((t (make-code-tree (car leafset)
-			   (cadr leafset)))
+  (let ((t (code-tree (car leafset)
+		      (cadr leafset)))
 	(rest (cddr leafset)))
-;;    (step)
+    ;;    (step)
     (if (null? rest)
 	t
 	(successive-merge (adjoin-set t rest)))))

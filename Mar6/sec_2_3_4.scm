@@ -10,12 +10,52 @@
 ;; Huffman use variable-length prefix codes that take advantage 
 ;; of the relative frequencies of the symbols in the messages to be encoded
 
-;; helper nethods from secr 2.3.3
-(define (element-of-set? x set)
-  (cond ((null? set) false) 
-        ((equal? x (car set)) true) 
-        (else (element-of-set? x (cdr set))))) 
 
+;; helper nethods from secr 2.3.3
+(define (element-of-set? x items)
+  (cond ((null? items) false) 
+	((equal? x (car items)) true) 
+	(else (element-of-set? x (cdr items)))))
+
+(define set-union append)
+
+
+(define-struct. weightset
+  sorted-items)
+
+(define empty-weightset (weightset '()))
+
+;; (define (element-of-weightset? x set)
+;;   (let next ((items (weightset.sorted-items set)))
+;;     (cond ((null? items) false) 
+;; 	  ((equal? x (car items)) true) 
+;; 	  (else (next x (cdr items))))))
+
+;; construct a set by comparing weights note x is never in the set
+(define (adjoin-weightset x set)
+  (weightset
+   (let next ((x x)
+	      (items (weightset.sorted-items set)))
+     (cond ((null? items) (list x))
+	   ((< (weight x) (weight (car items))) (cons x items))
+	   (else (cons (car items)
+		       (next x (cdr items))))))))
+
+(TEST
+ > (define flipped-adjoin-weightset (flip adjoin-weightset))
+ > (define t
+     (chain empty-weightset
+	    (flipped-adjoin-weightset (leaf 'A 3))
+	    (flipped-adjoin-weightset (leaf 'B 3))
+	    (flipped-adjoin-weightset (leaf 'C 4))
+	    (flipped-adjoin-weightset (leaf 'E 10))))
+ > t
+ #(weightset (#(leaf A 3) #(leaf B 3) #(leaf C 4) #(leaf E 10)))
+ > (adjoin-weightset (leaf 'F 11) t)
+ #(weightset (#(leaf A 3) #(leaf B 3) #(leaf C 4) #(leaf E 10) #(leaf F 11)))
+ > (adjoin-weightset (leaf 'F 1) t)
+ #(weightset (#(leaf F 1) #(leaf A 3) #(leaf B 3) #(leaf C 4) #(leaf E 10)))
+ )
 
 
 ;; the leafs of a Huffman tree ex: (A 8)
@@ -45,7 +85,7 @@
 (define (code-tree left right)
   (tree left
 	right
-	(append (symbols left) (symbols right))
+	(set-union (symbols left) (symbols right))
 	(+ (weight left) (weight right))))
 
 ;; generic selectors
@@ -85,28 +125,6 @@
         ((= bit 1) (tree.right branch))
         (else (error "bad bit -- CHOOSE-BRANCH" bit))))
 
-;; construct a set by comparing weights note x is never in the set
-(define (adjoin-set x set)
-  (cond ((null? set) (list x))
-        ((< (weight x) (weight (car set))) (cons x set))
-        (else (cons (car set)
-                    (adjoin-set x (cdr set))))))
-
-(TEST
- > (define flipped-adjoin-set (flip adjoin-set))
- > (define t
-     (chain '()
-	    (flipped-adjoin-set (leaf 'A 3))
-	    (flipped-adjoin-set (leaf 'B 3))
-	    (flipped-adjoin-set (leaf 'C 4))
-	    (flipped-adjoin-set (leaf 'E 10))))
- > t
- (#(leaf A 3) #(leaf B 3) #(leaf C 4) #(leaf E 10))
- > (adjoin-set (leaf 'F 11) t)
- (#(leaf A 3) #(leaf B 3) #(leaf C 4) #(leaf E 10) #(leaf F 11))
- > (adjoin-set (leaf 'F 1) t)
- (#(leaf F 1) #(leaf A 3) #(leaf B 3) #(leaf C 4) #(leaf E 10))
- )
 
 ;; takes a set of pairs ex  ((A 4) (B 2) (C 1) (D 1)) and constructs an initial set of leaves
 
@@ -116,21 +134,21 @@
 
 (define (leaf-set pairs)
   (if (null? pairs)
-      '()
+      empty-weightset
       (let ((pair (car pairs)))
-        (adjoin-set (leaf (car pair)	    ; symbol
-			  (cadr pair))	    ; frequency
-                    (leaf-set (cdr pairs))))))
+        (adjoin-weightset (leaf (car pair)   ; symbol
+				(cadr pair)) ; frequency
+			  (leaf-set (cdr pairs))))))
 
 (TEST
  > (leaf-set '())
- ()
+ #(weightset ())
  > (leaf-set '((A 4)))
- (#(leaf A 4))
+ #(weightset (#(leaf A 4)))
  > (leaf-set '((A 4) (B 2)))
- (#(leaf B 2) #(leaf A 4))
+ #(weightset (#(leaf B 2) #(leaf A 4)))
  > (leaf-set '((A 4) (D 1) (B 2) (C 1)))
- (#(leaf C 1) #(leaf D 1) #(leaf B 2) #(leaf A 4))
+ #(weightset (#(leaf C 1) #(leaf D 1) #(leaf B 2) #(leaf A 4)))
  )
 
 
@@ -181,13 +199,14 @@
 ;; take '((A 3) (B 5) (C 6) (D 6)), merge those subtrees with (equal?) lowest weights
 
 (define (successive-merge leafset)
-  (let ((t (code-tree (car leafset)
-		      (cadr leafset)))
-	(rest (cddr leafset)))
+  (let* ((items (weightset.sorted-items leafset))
+	 (t (code-tree (car items)
+		       (cadr items)))
+	 (rest (cddr items)))
     ;;    (step)
     (if (null? rest)
 	t
-	(successive-merge (adjoin-set t rest)))))
+	(successive-merge (adjoin-weightset t (weightset rest))))))
 
 
 ;; --------------------------------------------------------------------

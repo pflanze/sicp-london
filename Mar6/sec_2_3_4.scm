@@ -12,14 +12,21 @@
 
 
 ;; helper nethods from secr 2.3.3
-(define (element-of-set? x items)
-  (cond ((null? items) false) 
-	((equal? x (car items)) true) 
-	(else (element-of-set? x (cdr items)))))
+;;  with type wrapper
 
-(define set? (list-of symbol?))
+(define-struct. set
+  ;; unsorted
+  items)
 
-(define set-union append)
+(define (element-of-set? x set)
+  (let next ((x x)
+	     (items (set.items set)))
+    (cond ((null? items) false) 
+	  ((equal? x (car items)) true) 
+	  (else (next x (cdr items))))))
+
+(define (set.union a b)
+  (set (append (set.items a) (set.items b))))
 
 
 (define-struct. weightset
@@ -87,14 +94,14 @@
 (define (code-tree left right)
   (tree left
 	right
-	(set-union (symbols left) (symbols right))
+	(set.union (symbols left) (symbols right))
 	(+ (weight left) (weight right))))
 
 ;; generic selectors
 
 (define (symbols tree)
   (if (leaf? tree)
-      (list (leaf.symbol tree))
+      (set (list (leaf.symbol tree)))
       (tree.symbols tree)))
 
 (define (weight tree)

@@ -211,33 +211,48 @@
 
 ;; --------------------------------------------------------------------
 ;; tests
-(NOTE " ++ successive merge")
-(define test-tree (generate-huffman-tree '((B 5) (A 3) (D 6) (C 6)))) 
-
-
-(define (random-mesg len numsyms)
-  (define syms (list->vector (map (lambda (x)
-				    (string.symbol (string (.char (+ (.integer #\A) x)))))
-				  (iota numsyms))))
-  (map (lambda (_)
-	 (vector-ref syms (random-integer numsyms)))
-       (iota len)))
 
 (TEST
  > (equal? sample-bits (encode sample-message sample-tree))
  #t
+ > (define test-tree (generate-huffman-tree '((B 5) (A 3) (D 6) (C 6)))) 
  > (encode '(A B C D) test-tree)
  (0 0 0 1 1 0 1 1)
  > (decode # test-tree)
- (A B C D)
+ (A B C D))
 
- > (define (test len numsyms)
-     (let* ((m (random-mesg len numsyms))
-	    (e (encode m test-tree)))
-       ;;(step)
-       (equal? m (decode e test-tree))))
- > (test 20 4)
+
+(define (symbols-iota numsyms)
+  (map (lambda (x)
+	 (string.symbol (string (.char (+ (.integer #\A) x)))))
+       (iota numsyms)))
+
+(define (random-mesg len numsyms)
+  (define syms (list->vector (symbols-iota numsyms)))
+  (map (lambda (_)
+	 (vector-ref syms (random-integer numsyms)))
+       (iota len)))
+
+(define (random-tree numsyms)
+  (generate-huffman-tree
+   (map (lambda (s)
+	  (list s (inc (random-integer (* numsyms 2)))))
+	(symbols-iota numsyms))))
+
+(define (test len numsyms test-tree)
+  (let* ((m (random-mesg len numsyms))
+	 (e (encode m test-tree)))
+    ;;(step)
+    (equal? m (decode e test-tree))))
+
+(TEST
+ > (define test-tree (random-tree 4))
+ > (test 20 4 test-tree)
  #t
- > (test 200 3)
+ > (test 200 3 test-tree)
+ #t
+ > (test 200 3 (random-tree 3))
+ #t
+ > (test 200 300 (random-tree 300))
  #t
  )

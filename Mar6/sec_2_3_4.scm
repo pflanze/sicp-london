@@ -17,6 +17,8 @@
 	((equal? x (car items)) true) 
 	(else (element-of-set? x (cdr items)))))
 
+(define set? (list-of symbol?))
+
 (define set-union append)
 
 
@@ -75,7 +77,7 @@
 (define-struct. tree
   #(tree-or-leaf? left)
   #(tree-or-leaf? right)
-  symbols
+  #(set? symbols)
   #(natural? weight))
 
 (define tree-or-leaf? (either tree? leaf?))

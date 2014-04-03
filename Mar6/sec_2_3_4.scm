@@ -205,7 +205,6 @@
        (iota len)))
 
 (TEST
- > (encode '(A D A B B C A) sample-tree) 
  > (equal? sample-bits (encode sample-message sample-tree))
  #t
  > (encode '(A B C D) test-tree)
